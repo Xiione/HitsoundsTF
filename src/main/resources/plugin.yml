@@ -1,0 +1,16 @@
+name: HitsoundsTF
+version: 1.0
+author: Xiione
+main: io.github.xiione.HitsoundsTFPlugin
+api-version: 1.13
+
+commands:
+  hitsounds:
+    description: Main command
+    aliases: [hitsound, hs]
+
+permissions:
+  hitsoundstf.admin:
+    default: op
+  hitsoundstf.notifyupdate:
+    default: op
