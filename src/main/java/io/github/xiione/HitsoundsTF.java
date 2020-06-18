@@ -10,8 +10,7 @@ public class HitsoundsTF extends XiionePluginClass {
     }
 
     //TODO resourceID
-    //TODO initializing classes and listeners
     //TODO config loading solution
     //TODO better command structure, maybe even gui - smartinvs?
-    //TODO add some goddamn comments you doof
+    //TODO test protocollib event cancelling with NPCs
 }

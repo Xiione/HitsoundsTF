@@ -17,10 +17,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-//this.getCommand(XiionePluginClass.NAME).setExecutor(new XiionePluginClass());
 
 public abstract class XiionePluginClass implements Listener, CommandExecutor, TabCompleter {
 
+    //obnoxiously long constructor - there's probably a better way to do this
     public XiionePluginClass(JavaPlugin passedPlugin, String pluginName, String resourceID, double pluginVersion, String[] aliases, ChatColor[] themeColors) {
         this.plugin = passedPlugin;
         this.NAME_FORMATTED = pluginName;
@@ -48,12 +48,12 @@ public abstract class XiionePluginClass implements Listener, CommandExecutor, Ta
     public ChatColor SECONDARY_COLOR;
     public ChatColor PLAIN_COLOR;
 
-
+    //helper method
     public void reloadConfigs() {
         plugin.saveDefaultConfig();
-        FileConfiguration config = plugin.getConfig();
         plugin.reloadConfig();
     }
+
 
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] args) {
@@ -65,7 +65,7 @@ public abstract class XiionePluginClass implements Listener, CommandExecutor, Ta
             } else switch (args[0].toLowerCase()) {
                 case "reload":
                     if (args.length > 1) {
-                        commandSender.sendMessage(ChatColor.RED + "Too many arguments provided!");
+                        commandSender.sendMessage(ChatColor.RED + "Too many arguments provided!"); //TODO turn into helper method?
                         return true;
                     } else {
                         reloadConfigs();
@@ -93,10 +93,11 @@ public abstract class XiionePluginClass implements Listener, CommandExecutor, Ta
         }
     }
 
+    //Handler to notify for plugin updates
     @EventHandler
     public void playerJoin(PlayerJoinEvent e) {
         Player p = e.getPlayer();
-        if (p.hasPermission(NAME + ".notifyupdate")) { //TODO change me!! (notify_update &&)
+        if (p.hasPermission(NAME + ".notifyupdate")) { //TODO change me!! (notify_update &&) <- (two months later and i have no idea what this means anymore)
             UpdateCheck
                     .of(plugin)
                     .resourceId(Integer.parseInt(RESOURCE_ID))
@@ -107,6 +108,7 @@ public abstract class XiionePluginClass implements Listener, CommandExecutor, Ta
                                 p.sendMessage(SECONDARY_COLOR + "You can find it here: " + PRIMARY_COLOR + "https://www.spigotmc.org/resources/" + NAME + "." + RESOURCE_ID + "/");
                                 break;
                             case LATEST:
+                                //simply don't send a message
                                 break;
                             case UNAVAILABLE:
                                 p.sendMessage(ChatColor.RED + "Unable to perform a version check for " + NAME_FORMATTED + ".");
@@ -115,10 +117,12 @@ public abstract class XiionePluginClass implements Listener, CommandExecutor, Ta
         }
     }
 
+    //prevent any externally-handled autofilling - Commodore should take care of it
     @Override
     public List<String> onTabComplete(CommandSender commandSender, Command command, String s, String[] args) {
         for(String alias : PLUGIN_ALIASES) {
             if (command.getName().equalsIgnoreCase(alias)) {
+                //return an empty list to prevent playername filling - may change later for subcommands that need it - or implement own method
                 return new ArrayList<>();
             }
         }

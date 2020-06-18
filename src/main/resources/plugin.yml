@@ -3,6 +3,7 @@ version: 1.0
 author: Xiione
 main: io.github.xiione.HitsoundsTFPlugin
 api-version: 1.13
+depend: [ProtocolLib]
 
 commands:
   hitsounds:
