@@ -1,0 +1,63 @@
+## GENERAL CONFIG ##
+
+# Should the plugin check for a newer version on enable?
+# Players with the proper permissions will be notified on join.
+notify-update: true
+
+# Should MySQL be used to store player preferences?
+# If set to false, preferences will be stored using SQLite in HitsoundsTF\...
+# IMPORTANT: This MUST be enabled to connect to your configured MySQL database!
+# NOTE: Data needs to be manually migrated if switching over
+# NOTE: Requires restart
+use-mysql: false
+
+# Change these settings to connect to your MySQL database.
+# NOTE: Requires restart
+mysql-host: localhost
+mysql-port: 3306
+mysql-username: root
+mysql-password: 1234
+mysql-database: javawork
+
+mysql-database-table: hitsoundstf_preferences
+
+# Should HitsoundsTF attempt to silence the vanilla "ding" hitsound?
+# (e.g. from landing cross/bow arrows on other players)
+# NOTE: Requires restart
+disable-vanilla-hitsounds: true
+
+## HITSOUNDS CONFIG ##
+
+# What amount of damage should be considered to be the absolute
+# minimum (or close to minimum) amount of damage that can be dealt in an attack?
+# (2.0 points of damage = one heart)
+# This value is used to calculate hitsound pitch.
+# This should generally be much lower than high-damage. Adjust it to fit the gamemode.
+# NOTE: Requires restart
+low-damage: 1.0
+
+# What amount of damage should be considered to be the absolute
+# maximum (or close to maximum) amount of damage that can be dealt in an attack?
+# (2.0 points of damage = one heart)
+# This value is used to calculate hitsound pitch.
+# This should generally be much greater than low-damage. Adjust it to fit the gamemode.
+# NOTE: Requires restart
+high-damage: 20.0
+
+#Player preference defaults
+default-enable-hitsounds: true
+
+default-hitsound: ENTITY_EXPERIENCE_ORB_PICKUP
+default-hitsound-volume: 1.0
+default-hitsound-low-damage-pitch: 2.0
+default-hitsound-high-damage-pitch: 0.5
+
+default-enable-killsounds: true
+
+default-killsound: ENTITY_PLAYER_LEVELUP
+default-killsound-volume: 1.0
+default-killsound-low-damage-pitch: 2.0
+default-killsound-high-damage-pitch: 0.5
+
+#Crackshot integration
+enable-crackshot: true

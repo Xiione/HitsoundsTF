@@ -17,7 +17,7 @@ import java.util.function.BiConsumer;
 
 public class UpdateCheck {
 
-    //huge thanks to SpigotMC user slees for this
+    //Credit to SpigotMC user slees
     //https://www.spigotmc.org/threads/resource-update-check-clean-simple.329894/
 
     private static final String SPIGOT_URL = "https://api.spigotmc.org/legacy/update.php?resource=%d";
@@ -31,6 +31,14 @@ public class UpdateCheck {
     private UpdateCheck(@Nonnull JavaPlugin javaPlugin) {
         this.javaPlugin = Objects.requireNonNull(javaPlugin, "javaPlugin");
         this.currentVersion = javaPlugin.getDescription().getVersion();
+    }
+
+    public enum VersionResponse {
+
+        LATEST,
+        FOUND_NEW,
+
+        UNAVAILABLE
     }
 
     public static UpdateCheck of(@Nonnull JavaPlugin javaPlugin) {
