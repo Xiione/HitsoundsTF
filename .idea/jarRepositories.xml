@@ -32,6 +32,11 @@
       <option name="url" value="https://libraries.minecraft.net/" />
     </remote-repository>
     <remote-repository>
+      <option name="id" value="mylib" />
+      <option name="name" value="mylib" />
+      <option name="url" value="file://C:\Users\Hamilton Wang\IdeaProjects\HitsoundsTF/lib" />
+    </remote-repository>
+    <remote-repository>
       <option name="id" value="nms-repo" />
       <option name="name" value="nms-repo" />
       <option name="url" value="https://repo.codemc.org/repository/nms/" />

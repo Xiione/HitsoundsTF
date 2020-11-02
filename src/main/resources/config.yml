@@ -5,7 +5,7 @@
 notify-update: true
 
 # Should MySQL be used to store player preferences?
-# If set to false, preferences will be stored using SQLite in HitsoundsTF\...
+# If set to false, preferences will be stored using SQLite in HitsoundsTF\database.db
 # IMPORTANT: This MUST be enabled to connect to your configured MySQL database!
 # NOTE: Data needs to be manually migrated if switching over
 # NOTE: Requires restart
@@ -18,8 +18,6 @@ mysql-port: 3306
 mysql-username: root
 mysql-password: 1234
 mysql-database: javawork
-
-mysql-database-table: hitsoundstf_preferences
 
 # Should HitsoundsTF attempt to silence the vanilla "ding" hitsound?
 # (e.g. from landing cross/bow arrows on other players)

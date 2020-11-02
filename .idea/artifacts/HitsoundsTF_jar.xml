@@ -3,7 +3,6 @@
     <output-path>D:/Hamo garbage/javawork/Spigot1.16/plugins</output-path>
     <root id="archive" name="HitsoundsTF.jar">
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/google/code/findbugs/jsr305/3.0.2/jsr305-3.0.2.jar" path-in-jar="/" />
-      <element id="library" level="project" name="Maven: com.google.code.findbugs:jsr305:3.0.2" />
       <element id="module-output" name="HitsoundsTF" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/mojang/brigadier/1.0.17/brigadier-1.0.17.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/me/lucko/commodore/1.9/commodore-1.9.jar" path-in-jar="/" />

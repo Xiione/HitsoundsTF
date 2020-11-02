@@ -1,36 +1,39 @@
 package io.github.xiione;
 
 import com.mojang.brigadier.tree.LiteralCommandNode;
+import io.github.xiione.sql.MySQL;
+import io.github.xiione.sql.SQL;
+import io.github.xiione.sql.SQLite;
 import me.lucko.commodore.Commodore;
 import me.lucko.commodore.CommodoreProvider;
 import me.lucko.commodore.file.CommodoreFileFormat;
 import org.bukkit.Bukkit;
 import org.bukkit.command.PluginCommand;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.logging.Logger;
 
 
 public class HitsoundsTFPlugin extends JavaPlugin {
 
-    private final PlayerPreferencesManager preferencesManager = new PlayerPreferencesManager(this);
+    private final HitsoundsTF hitsoundsTF;
 
-    private final HitsoundsTF hitsoundsTF = new HitsoundsTF(this, preferencesManager);
+    private SQL sql;
 
-    private Logger logger = this.getLogger();
-    private MySQL mySQL = new MySQL(this);
+    private final PlayerPreferencesManager preferencesManager;
+
+    public HitsoundsTFPlugin() {
+        this.preferencesManager = new PlayerPreferencesManager();
+        this.hitsoundsTF = new HitsoundsTF(this, this.preferencesManager);
+    }
 
     @Override
     public void onEnable() {
-        this.saveDefaultConfig();
+        this.reloadConfigs();
 
         PluginCommand hitsoundsCommand = this.getCommand("hitsounds");
         hitsoundsCommand.setExecutor(hitsoundsTF);
-
-        //try Commodore tabcompletion support
         if (CommodoreProvider.isSupported()) {
             Commodore commodore = CommodoreProvider.getCommodore(this);
             LiteralCommandNode<?> hitsoundsCommodore = null;
@@ -42,84 +45,32 @@ public class HitsoundsTFPlugin extends JavaPlugin {
             commodore.register(hitsoundsCommand, hitsoundsCommodore);
         }
 
-        //register event listeners
-        //TODO register listeners only if config option says to
-        //TODO seperate mysql and sqlite events
-        this.getServer().getPluginManager().registerEvents(hitsoundsTF, this);
-
         if (this.getConfig().getBoolean("use-mysql")) {
-            try {
-                mySQL.openConnection();
-
-                //try creating preferences table if first launch
-                try {
-                    PreparedStatement statement = mySQL.getConnection().prepareStatement(
-                            "CREATE TABLE IF NOT EXISTS hitsoundstf_preferences (" +
-                                    "uuid char(32) PRIMARY KEY," +
-                                    "name varchar(16)," +
-
-                                    "enable_hitsounds BOOL DEFAULT ?," + //1
-                                    "hitsound VARCHAR(99) DEFAULT ?," + //2
-                                    "hitsound_volume FLOAT DEFAULT ?," + //3
-                                    "low_damage_pitch FLOAT DEFAULT ?," + //4
-                                    "high_damage_pitch FLOAT DEFAULT ?," + //5
-
-                                    "enable_killsounds BOOL DEFAULT ?," + //6
-                                    "killsound VARCHAR(99) DEFAULT ?," + //7
-                                    "killsound_volume FLOAT DEFAULT ?," + //8
-                                    "low_kill_pitch FLOAT DEFAULT ?," + //9
-                                    "high_kill_pitch FLOAT DEFAULT ?" + //10
-                                    ");"
-                    );
-
-                    statement.setBoolean(1, this.getConfig().getBoolean("default-enable-hitsounds"));
-                    statement.setString(2, this.getConfig().getString("default-hitsound"));
-                    statement.setFloat(3, (float) this.getConfig().getDouble("default-hitsound-volume"));
-                    statement.setFloat(4, (float) this.getConfig().getDouble("default-hitsound-low-damage-pitch"));
-                    statement.setFloat(5, (float) this.getConfig().getDouble("default-hitsound-high-damage-pitch"));
-
-                    statement.setBoolean(6, this.getConfig().getBoolean("default-enable-killsounds"));
-                    statement.setString(7, this.getConfig().getString("default-killsound"));
-                    statement.setFloat(8, (float) this.getConfig().getDouble("default-killsound-volume"));
-                    statement.setFloat(9, (float) this.getConfig().getDouble("default-killsound-low-damage-pitch"));
-                    statement.setFloat(10, (float) this.getConfig().getDouble("default-killsound-high-damage-pitch"));
-
-                    statement.execute();
-                    statement.close();
-                } catch (SQLException e) {
-                    logger.warning("An SQL database update error has occurred!");
-                    e.printStackTrace();
-                    Bukkit.getPluginManager().disablePlugin(this);
-                }
-            } catch (SQLException e) {
-                logger.warning("An SQL database access error has occurred!");
-                logger.warning("Please check your database connection, or disable use-mysql in the config to enable SQLite storage.");
-                Bukkit.getPluginManager().disablePlugin(this);
-            } catch (ClassNotFoundException e) {
-                logger.warning("The required MySQL JDBC drivers were not found!");
-                Bukkit.getPluginManager().disablePlugin(this);
-            }
+            sql = new MySQL(this, preferencesManager);
         } else {
-            //TODO SQLite storage
+            sql = new SQLite(this, preferencesManager);
         }
+
+        //try creating table if first launch
+        sql.openConnection();
+        sql.createTable();
+
+        this.getServer().getPluginManager().registerEvents(hitsoundsTF, this);
+        this.getServer().getPluginManager().registerEvents(sql, this);
     }
 
 
     @Override
     public void onDisable() {
-
+        if (sql.getConnection() != null) {
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                sql.savePlayerPreferences(player);
+            }
+        }
     }
 
-    /**
-     * Reloads the plugin configuration, or writes the default configuration
-     * to the plugin folder if the file does not exist
-     */
     public void reloadConfigs() {
         this.saveDefaultConfig();
         this.reloadConfig();
-    }
-
-    public MySQL getMySQL() {
-        return this.mySQL;
     }
 }

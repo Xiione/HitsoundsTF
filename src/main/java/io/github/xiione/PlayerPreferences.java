@@ -1,22 +1,22 @@
 package io.github.xiione;
 
 import org.bukkit.Sound;
+import org.bukkit.configuration.file.FileConfiguration;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-/**
- * Stores personal hitsound preference data for an online player
- */
 public class PlayerPreferences {
+
+    private boolean changesMade = false;
 
     private boolean enableHitsounds;
 
     private Sound hitsound;
     private float hitsoundVolume;
 
-    private float lowDamagePitch;
-    private float highDamagePitch;
+    private float lowHitPitch;
+    private float highHitPitch;
 
     private boolean enableKillsounds;
 
@@ -26,43 +26,54 @@ public class PlayerPreferences {
     private float lowKillPitch;
     private float highKillPitch;
 
-    /**
-     * @param resultSet The SQL result set containing the player's preferences values
-     */
     public PlayerPreferences(ResultSet resultSet) {
-        //TODO probably wise to handle issues with >1 or <0 results in here or in preferences manager
         try {
-            if (resultSet.next()) {
-                //TODO research default value settings for new players or columns
-                enableHitsounds = resultSet.getBoolean("enable_hitsounds");
-                hitsound = Sound.valueOf(resultSet.getString("hitsound"));
-                hitsoundVolume = resultSet.getFloat("hitsound_volume");
-                lowDamagePitch = resultSet.getFloat("low_damage_pitch");
-                highDamagePitch = resultSet.getFloat("high_damage_pitch");
+            enableHitsounds = resultSet.getBoolean("enable_hitsounds");
+            hitsound = Sound.valueOf(resultSet.getString("hitsound"));
+            hitsoundVolume = resultSet.getFloat("hitsound_volume");
+            lowHitPitch = resultSet.getFloat("low_hit_pitch");
+            highHitPitch = resultSet.getFloat("high_hit_pitch");
 
-                enableKillsounds = resultSet.getBoolean("enable_killsounds");
-                killsound = Sound.valueOf(resultSet.getString("killsound"));
-                killsoundVolume = resultSet.getFloat("killsound_volume");
-                lowKillPitch = resultSet.getFloat("low_kill_pitch");
-                highKillPitch = resultSet.getFloat("high_kill_pitch");
-            }
+            enableKillsounds = resultSet.getBoolean("enable_killsounds");
+            killsound = Sound.valueOf(resultSet.getString("killsound"));
+            killsoundVolume = resultSet.getFloat("killsound_volume");
+            lowKillPitch = resultSet.getFloat("low_kill_pitch");
+            highKillPitch = resultSet.getFloat("high_kill_pitch");
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
     }
 
+    public PlayerPreferences(FileConfiguration config) {
+        enableHitsounds = config.getBoolean("default-enable-hitsounds");
+        hitsound = Sound.valueOf(config.getString("default-hitsound"));
+        hitsoundVolume = (float) config.getDouble("default-hitsound-volume");
+        lowHitPitch = (float) config.getDouble("default-hitsound-low-damage-pitch");
+        highHitPitch = (float) config.getDouble("default-hitsound-high-damage-pitch");
 
-    public boolean isEnabledHitsounds() {
+        enableKillsounds = config.getBoolean("default-enable-killsounds");
+        killsound = Sound.valueOf(config.getString("default-killsound"));
+        killsoundVolume = (float) config.getDouble("default-killsound-volume");
+        lowKillPitch = (float) config.getDouble("default-killsound-low-damage-pitch");
+        highKillPitch = (float) config.getDouble("default-killsound-high-damage-pitch");
+
+    }
+
+    public boolean changesMade() {
+        return changesMade;
+    }
+
+    public boolean getEnableHitsounds() {
         return enableHitsounds;
     }
 
-    public float getLowDamagePitch() {
-        return lowDamagePitch;
+    public float getLowHitPitch() {
+        return lowHitPitch;
     }
 
-    public float getHighDamagePitch() {
-        return highDamagePitch;
+    public float getHighHitPitch() {
+        return highHitPitch;
     }
 
     public Sound getHitsound() {
@@ -73,7 +84,7 @@ public class PlayerPreferences {
         return hitsoundVolume;
     }
 
-    public boolean isEnabledKillsounds() {
+    public boolean getEnableKillsounds() {
         return enableKillsounds;
     }
 
@@ -91,5 +102,55 @@ public class PlayerPreferences {
 
     public float getKillsoundVolume() {
         return killsoundVolume;
+    }
+
+    public void setEnableHitsounds(boolean enableHitsounds) {
+        this.enableHitsounds = enableHitsounds;
+        changesMade = true;
+    }
+
+    public void setHitsound(Sound hitsound) {
+        this.hitsound = hitsound;
+        changesMade = true;
+    }
+
+    public void setHitsoundVolume(float hitsoundVolume) {
+        this.hitsoundVolume = hitsoundVolume;
+        changesMade = true;
+    }
+
+    public void setLowHitPitch(float lowHitPitch) {
+        this.lowHitPitch = lowHitPitch;
+        changesMade = true;
+    }
+
+    public void setHighHitPitch(float highHitPitch) {
+        this.highHitPitch = highHitPitch;
+        changesMade = true;
+    }
+
+    public void setEnableKillsounds(boolean enableKillsounds) {
+        this.enableKillsounds = enableKillsounds;
+        changesMade = true;
+    }
+
+    public void setKillsound(Sound killsound) {
+        this.killsound = killsound;
+        changesMade = true;
+    }
+
+    public void setKillsoundVolume(float killsoundVolume) {
+        this.killsoundVolume = killsoundVolume;
+        changesMade = true;
+    }
+
+    public void setLowKillPitch(float lowKillPitch) {
+        this.lowKillPitch = lowKillPitch;
+        changesMade = true;
+    }
+
+    public void setHighKillPitch(float highKillPitch) {
+        this.highKillPitch = highKillPitch;
+        changesMade = true;
     }
 }
