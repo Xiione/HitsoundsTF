@@ -64,93 +64,63 @@ public class PlayerPreferences {
         return changesMade;
     }
 
-    public boolean getEnableHitsounds() {
-        return enableHitsounds;
+    public boolean getEnabled(boolean kill) {
+        return kill ? enableKillsounds : enableHitsounds;
     }
 
-    public float getLowHitPitch() {
-        return lowHitPitch;
+    public Sound getSound(boolean kill) {
+        return kill ? killsound : hitsound;
     }
 
-    public float getHighHitPitch() {
-        return highHitPitch;
+    public float getVolume(boolean kill) {
+        return kill ? killsoundVolume : hitsoundVolume;
     }
 
-    public Sound getHitsound() {
-        return hitsound;
+    public float getLowDmgPitch(boolean kill) {
+        return kill ? lowKillPitch : lowHitPitch;
     }
 
-    public float getHitsoundVolume() {
-        return hitsoundVolume;
+    public float getHighDmgPitch(boolean kill) {
+        return kill ? highKillPitch : highHitPitch;
     }
 
-    public boolean getEnableKillsounds() {
-        return enableKillsounds;
-    }
-
-    public float getLowKillPitch() {
-        return lowKillPitch;
-    }
-
-    public float getHighKillPitch() {
-        return highKillPitch;
-    }
-
-    public Sound getKillsound() {
-        return killsound;
-    }
-
-    public float getKillsoundVolume() {
-        return killsoundVolume;
-    }
-
-    public void setEnableHitsounds(boolean enableHitsounds) {
-        this.enableHitsounds = enableHitsounds;
+    public void setEnabled(boolean enabled, boolean kill) {
+        if (kill)
+            enableKillsounds = enabled;
+        else
+            enableHitsounds = enabled;
         changesMade = true;
     }
 
-    public void setHitsound(Sound hitsound) {
-        this.hitsound = hitsound;
+    public void setSound(Sound sound, boolean kill) {
+        if (kill)
+            killsound = sound;
+        else
+            hitsound = sound;
         changesMade = true;
     }
 
-    public void setHitsoundVolume(float hitsoundVolume) {
-        this.hitsoundVolume = hitsoundVolume;
+    public void setVolume(float volume, boolean kill) {
+        if (kill)
+            killsoundVolume = volume;
+        else
+            hitsoundVolume = volume;
         changesMade = true;
     }
 
-    public void setLowHitPitch(float lowHitPitch) {
-        this.lowHitPitch = lowHitPitch;
+    public void setLowDmgPitch(float pitch, boolean kill) {
+        if (kill)
+            lowKillPitch = pitch;
+        else
+            lowHitPitch = pitch;
         changesMade = true;
     }
 
-    public void setHighHitPitch(float highHitPitch) {
-        this.highHitPitch = highHitPitch;
-        changesMade = true;
-    }
-
-    public void setEnableKillsounds(boolean enableKillsounds) {
-        this.enableKillsounds = enableKillsounds;
-        changesMade = true;
-    }
-
-    public void setKillsound(Sound killsound) {
-        this.killsound = killsound;
-        changesMade = true;
-    }
-
-    public void setKillsoundVolume(float killsoundVolume) {
-        this.killsoundVolume = killsoundVolume;
-        changesMade = true;
-    }
-
-    public void setLowKillPitch(float lowKillPitch) {
-        this.lowKillPitch = lowKillPitch;
-        changesMade = true;
-    }
-
-    public void setHighKillPitch(float highKillPitch) {
-        this.highKillPitch = highKillPitch;
+    public void setHighDmgPitch(float pitch, boolean kill) {
+        if (kill)
+            highKillPitch = pitch;
+        else
+            highHitPitch = pitch;
         changesMade = true;
     }
 }

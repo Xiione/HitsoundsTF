@@ -6,12 +6,81 @@ api-version: 1.16
 softdepend: [ Crackshot ]
 
 commands:
-  hitsounds:
+  hitsoundstf:
     description: Main command
-    aliases: [ hitsound, hs ]
+  hitsound:
+    description: Modify personal hitsound settings
+    aliases: [ hs ]
+  killsound:
+    description: Modify personal killsound settings
+    aliases: [ ks ]
+  hso:
+    description: Modify other online players' settings
+
+
 
 permissions:
-  hitsoundstf.admin:
+  hitsoundstf.*:
+    description: Permission for full plugin administator access
     default: op
+    children:
+      hitsoundstf.reload: true
+      hitsoundstf.set.others: true
+      hitsoundstf.set.all: true
+
+  hitsoundstf.reload:
+    description: Permission to reload plugin configuration
   hitsoundstf.notifyupdate:
-    default: op
+    description: Permission to receive notification when plugin is outdated
+  hitsoundstf.set.others:
+    description: Permission to modify all the settings of other players
+  hitsoundstf.set.all:
+    description: Permission to modify all personal killsound settings
+    children:
+      hitsoundstf.hitsound.toggle: true
+      hitsoundstf.killsound.toggle: true
+      hitsoundstf.hitsound.sound.all: true
+      hitsoundstf.killsound.sound.all: true
+      hitsoundstf.hitsound.volume: true
+      hitsoundstf.hitsound.lowdmgpitch: true
+      hitsoundstf.hitsound.highdmgpitch: true
+      hitsoundstf.killsound.volume: true
+      hitsoundstf.killsound.lowdmgpitch: true
+      hitsoundstf.killsound.highdmgpitch: true
+
+  hitsoundstf.set.limited:
+    description: Permission to modify all personal killsound settings except sound effects
+    children:
+      hitsoundstf.hitsound.toggle: true
+      hitsoundstf.killsound.toggle: true
+      hitsoundstf.hitsound.volume: true
+      hitsoundstf.hitsound.lowdmgpitch: true
+      hitsoundstf.hitsound.highdmgpitch: true
+      hitsoundstf.killsound.volume: true
+      hitsoundstf.killsound.lowdmgpitch: true
+      hitsoundstf.killsound.highdmgpitch: true
+
+  hitsoundstf.hitsound.toggle:
+    description: Permission to toggle hitsound on and off
+  hitsoundstf.killsound.toggle:
+    description: Permission to toggle killsound on and off
+
+  hitsoundstf.hitsound.sound.all:
+    description: Permission to change hitsound to any sound effect
+  hitsoundstf.killsound.sound.all:
+    description: Permission to change killsound to any sound effect
+
+  hitsoundstf.hitsound.volume:
+    description: Permission to change hitsound volume
+  hitsoundstf.hitsound.lowdmgpitch:
+    description: Permission to change hitsound low damage pitch
+  hitsoundstf.hitsound.highdmgpitch:
+    description: Permission to change hitsound high damage pitch
+
+  hitsoundstf.killsound.volume:
+    description: Permission to change killsound volume
+  hitsoundstf.killsound.lowdmgpitch:
+    description: Permission to change killsound low damage pitch
+  hitsoundstf.killsound.highdmgpitch:
+    description: Permission to change killsound high damage pitch
+

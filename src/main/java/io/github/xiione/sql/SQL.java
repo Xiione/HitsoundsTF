@@ -1,5 +1,6 @@
 package io.github.xiione.sql;
 
+import io.github.xiione.HitsoundsTFPlugin;
 import io.github.xiione.PlayerPreferences;
 import io.github.xiione.PlayerPreferencesManager;
 import org.bukkit.Bukkit;
@@ -25,9 +26,9 @@ public abstract class SQL implements Listener {
 
     final PlayerPreferencesManager preferencesManager;
 
-    public SQL(JavaPlugin plugin, PlayerPreferencesManager preferencesManager) {
+    public SQL(HitsoundsTFPlugin plugin) {
         this.plugin = plugin;
-        this.preferencesManager = preferencesManager;
+        this.preferencesManager = plugin.getPreferencesManager();
     }
 
     public abstract void openConnection();
@@ -97,7 +98,6 @@ public abstract class SQL implements Listener {
                 //add player to preferences cache
                 if (resultSet.next()) {
                     //load prefs from result
-                    //TODO test this
                     preferencesManager.put(uuid, new PlayerPreferences(resultSet));
                 } else {
                     //load default prefs

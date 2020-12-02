@@ -18,37 +18,51 @@ import java.io.IOException;
 public class HitsoundsTFPlugin extends JavaPlugin {
 
     private final HitsoundsTF hitsoundsTF;
+    private final HTFCommandExecutor commandExecutor;
 
     private SQL sql;
 
     private final PlayerPreferencesManager preferencesManager;
 
+    public final String RESOURCE_ID;
+    public final String PLUGIN_VERSION;
+
     public HitsoundsTFPlugin() {
+        this.RESOURCE_ID = "00000";
+        this.PLUGIN_VERSION = this.getDescription().getVersion();
+
         this.preferencesManager = new PlayerPreferencesManager();
-        this.hitsoundsTF = new HitsoundsTF(this, this.preferencesManager);
+        this.hitsoundsTF = new HitsoundsTF(this);
+        this.commandExecutor = new HTFCommandExecutor(this);
     }
 
     @Override
     public void onEnable() {
         this.reloadConfigs();
 
-        PluginCommand hitsoundsCommand = this.getCommand("hitsounds");
-        hitsoundsCommand.setExecutor(hitsoundsTF);
+        PluginCommand hitsoundstfCommand = this.getCommand("hitsoundstf");
+        PluginCommand hitsoundCommand = this.getCommand("hitsound");
+        PluginCommand killsoundCommand = this.getCommand("killsound");
+        PluginCommand hsoCommand = this.getCommand("hso");
+
+        hitsoundstfCommand.setExecutor(this.commandExecutor);
+        hitsoundCommand.setExecutor(this.commandExecutor);
+        killsoundCommand.setExecutor(this.commandExecutor);
+        hsoCommand.setExecutor(this.commandExecutor);
         if (CommodoreProvider.isSupported()) {
             Commodore commodore = CommodoreProvider.getCommodore(this);
-            LiteralCommandNode<?> hitsoundsCommodore = null;
             try {
-                hitsoundsCommodore = CommodoreFileFormat.parse(this.getResource("hitsounds.commodore"));
+                LiteralCommandNode<?> commodoreFile = CommodoreFileFormat.parse(this.getResource("hitsounds.commodore"));
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            commodore.register(hitsoundsCommand, hitsoundsCommodore);
+
         }
 
         if (this.getConfig().getBoolean("use-mysql")) {
-            sql = new MySQL(this, preferencesManager);
+            sql = new MySQL(this);
         } else {
-            sql = new SQLite(this, preferencesManager);
+            sql = new SQLite(this);
         }
 
         //try creating table if first launch
@@ -72,5 +86,9 @@ public class HitsoundsTFPlugin extends JavaPlugin {
     public void reloadConfigs() {
         this.saveDefaultConfig();
         this.reloadConfig();
+    }
+
+    public PlayerPreferencesManager getPreferencesManager() {
+        return preferencesManager;
     }
 }

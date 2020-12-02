@@ -1,10 +1,9 @@
 package io.github.xiione.sql;
 
+import io.github.xiione.HitsoundsTFPlugin;
 import io.github.xiione.PlayerPreferences;
-import io.github.xiione.PlayerPreferencesManager;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,8 +16,8 @@ public class SQLite extends SQL {
 
     private final File file;
 
-    public SQLite(JavaPlugin plugin, PlayerPreferencesManager preferencesManager) {
-        super(plugin, preferencesManager);
+    public SQLite(HitsoundsTFPlugin plugin) {
+        super(plugin);
 
         file = new File(plugin.getDataFolder(), "database.db");
     }
@@ -111,16 +110,16 @@ public class SQLite extends SQL {
                             "VALUES(" +
                             "'" + uuid.toString() + "', " +
                             "'" + player.getName() + "', " +
-                            prefs.getEnableHitsounds() + ", " +
-                            "'" + prefs.getHitsound().toString() + "', " +
-                            prefs.getHitsoundVolume() + ", " +
-                            prefs.getLowHitPitch() + ", " +
-                            prefs.getHighHitPitch() + ", " +
-                            prefs.getEnableKillsounds() + ", " +
-                            "'" + prefs.getKillsound().toString() + "', " +
-                            prefs.getKillsoundVolume() + ", " +
-                            prefs.getLowKillPitch() + ", " +
-                            prefs.getHighKillPitch() +
+                            prefs.getEnabled(false) + ", " +
+                            "'" + prefs.getSound(false) + "', " +
+                            prefs.getVolume(false) + ", " +
+                            prefs.getLowDmgPitch(false) + ", " +
+                            prefs.getHighDmgPitch(false) + ", " +
+                            prefs.getEnabled(true) + ", " +
+                            "'" + prefs.getSound(true) + "', " +
+                            prefs.getVolume(true) + ", " +
+                            prefs.getLowDmgPitch(true) + ", " +
+                            prefs.getHighDmgPitch(true) +
                             ") " +
 
                             "ON CONFLICT(uuid) DO UPDATE SET " +

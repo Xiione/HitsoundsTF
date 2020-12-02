@@ -3,7 +3,6 @@ package io.github.xiione;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Damageable;
@@ -19,164 +18,21 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-public class HitsoundsTF implements Listener, CommandExecutor, TabCompleter {
-
-    private HitsoundsTFPlugin plugin;
-    private PlayerPreferencesManager preferencesManager;
-
-    public final String NAME_FORMATTED;
-    public final String NAME;
-    public final String RESOURCE_ID;
-
-    private final double PLUGIN_VERSION;
-    private String[] PLUGIN_ALIASES;
-    private ChatColor COLOR_P;
-    private ChatColor COLOR_S;
-    private ChatColor COLOR_T;
+public class HitsoundsTF implements Listener, TabCompleter {
 
     private final double LOW_DAMAGE;
     private final double HIGH_DAMAGE;
+    private final boolean IGNORE_LOW;
+    private final HitsoundsTFPlugin plugin;
+    private final PlayerPreferencesManager preferencesManager;
 
-
-    public HitsoundsTF(HitsoundsTFPlugin plugin, PlayerPreferencesManager preferencesManager) {
+    public HitsoundsTF(HitsoundsTFPlugin plugin) {
         this.plugin = plugin;
-        this.preferencesManager = preferencesManager;
+        this.preferencesManager = plugin.getPreferencesManager();
 
-        this.NAME_FORMATTED = "HitsoundsTF";
-        this.NAME = NAME_FORMATTED.toLowerCase();
-        this.RESOURCE_ID = "00000";
-        this.PLUGIN_VERSION = 1.0;
-
-        this.PLUGIN_ALIASES = new String[]{"hitsounds", "hitsound", "hs"};
-
-        COLOR_P = ChatColor.GOLD;
-        COLOR_S = ChatColor.GRAY;
-        COLOR_T = ChatColor.WHITE;
-
+        IGNORE_LOW = plugin.getConfig().getBoolean("ignore-low-damage");
         LOW_DAMAGE = plugin.getConfig().getDouble("low-damage");
         HIGH_DAMAGE = plugin.getConfig().getDouble("high-damage");
-    }
-
-    @Override
-    public boolean onCommand(CommandSender commandSender, Command command, String s, String[] args) {
-        if (commandSender.hasPermission(NAME + ".admin")) {
-            if (args.length == 0) {
-                commandSender.sendMessage(COLOR_P + NAME_FORMATTED + " " + PLUGIN_VERSION + " " + COLOR_S + "by Xiione");
-                commandSender.sendMessage(COLOR_S + "https://www.spigotmc.org/resources/" + NAME + "." + RESOURCE_ID + "/");
-                commandSender.sendMessage(COLOR_P + "Usage: " + COLOR_S + "/" + PLUGIN_ALIASES[0] + " [help|reload]");
-            } else switch (args[0].toLowerCase()) {
-                case "reload":
-                    if (args.length > 1) { //TODO no need for "too many arguments"
-                        commandSender.sendMessage(ChatColor.RED + "Too many arguments provided!"); //TODO turn into helper method?
-                        return true;
-                    } else {
-                        plugin.reloadConfigs();
-                        commandSender.sendMessage(ChatColor.GREEN + NAME_FORMATTED + " config reloaded!");
-                        return true;
-                    }
-                case "help":
-                    if (args.length > 1) {
-                        commandSender.sendMessage(ChatColor.RED + "Too many arguments provided!");
-                        return true;
-                    } else {
-                        commandSender.sendMessage(COLOR_S + "/" + PLUGIN_ALIASES[0] + "" + COLOR_T + ": Show plugin info.");
-                        commandSender.sendMessage(COLOR_S + "/" + PLUGIN_ALIASES[0] + " help" + COLOR_T + ": Show command usages.");
-                        commandSender.sendMessage(COLOR_S + "/" + PLUGIN_ALIASES[0] + " reload" + COLOR_T + ": Reload the plugin configuration.");
-                        return true;
-                    }
-                case "test":
-                    //TODO remove test!
-                    if (args.length > 1) {
-                        commandSender.sendMessage(ChatColor.RED + "Too many arguments provided!");
-                        return true;
-                    } else {
-                        return true;
-                    }
-                default:
-                    commandSender.sendMessage(ChatColor.RED + "Unknown subcommand!");
-                    return true;
-            }
-            return false;
-        } else {
-            commandSender.sendMessage(ChatColor.RED + "No permission!");
-            return true;
-        }
-    }
-
-    @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent e) {
-        Player p = e.getPlayer();
-        if (plugin.getConfig().getBoolean("notify-update") && p.hasPermission(NAME + ".notifyupdate")) {
-            UpdateCheck
-                    .of(plugin)
-                    .resourceId(Integer.parseInt(RESOURCE_ID))
-                    .handleResponse((versionResponse, version) -> {
-                        switch (versionResponse) {
-                            case FOUND_NEW:
-                                p.sendMessage(COLOR_P + "A new version of " + NAME_FORMATTED + " is available!" + COLOR_S + " (" + COLOR_S + version + COLOR_S + ")");
-                                p.sendMessage(COLOR_S + "You can find it here: " + COLOR_P + "https://www.spigotmc.org/resources/" + NAME + "." + RESOURCE_ID + "/");
-                                break;
-                            case LATEST:
-                                //simply don't send a message
-                                break;
-                            case UNAVAILABLE:
-                                p.sendMessage(ChatColor.RED + "Unable to perform a version check for " + NAME_FORMATTED + ".");
-                        }
-                    }).check();
-        }
-    }
-
-    @Override
-    public List<String> onTabComplete(CommandSender commandSender, Command command, String s, String[] args) {
-        for (String alias : PLUGIN_ALIASES) {
-            if (command.getName().equalsIgnoreCase(alias)) {
-                //return an empty list to prevent playername filling
-                return new ArrayList<>();
-            }
-        }
-        return null;
-    }
-
-    @EventHandler
-    public void onEntityDamageByEntity(EntityDamageByEntityEvent e) {
-        Entity damager = e.getDamager();
-        switch (damager.getType()) {
-            case PLAYER:
-                break;
-            //TODO add more cases and test with crackshot
-            //TODO config options to disable hitsounds for certain damage types
-            //https://github.com/Shampaggon/CrackShot/wiki/Hooking-into-CrackShot
-            case ARROW:
-            case SPECTRAL_ARROW:
-            case TRIDENT:
-            case ENDER_PEARL:
-            case SNOWBALL:
-            case EGG:
-                damager = (Player) ((Projectile) damager).getShooter();
-                break;
-            default:
-                return;
-        }
-
-        double damage = e.getFinalDamage();
-
-        PlayerPreferences prefs = preferencesManager.get(damager.getUniqueId());
-
-        Sound sound;
-        float volume;
-        float pitch;
-
-        //check if hit is killing and use assign appropriate variables
-        if (isFinalBlow(e)) {
-            sound = prefs.getKillsound();
-            volume = prefs.getKillsoundVolume();
-            pitch = calculateHitsoundPitch(damage, prefs.getLowKillPitch(), prefs.getHighKillPitch(), LOW_DAMAGE, HIGH_DAMAGE);
-        } else {
-            sound = prefs.getHitsound();
-            volume = prefs.getHitsoundVolume();
-            pitch = calculateHitsoundPitch(damage, prefs.getLowHitPitch(), prefs.getHighHitPitch(), LOW_DAMAGE, HIGH_DAMAGE);
-        }
-        playSound((Player) damager, sound, volume, pitch);
     }
 
     /**
@@ -232,20 +88,93 @@ public class HitsoundsTF implements Listener, CommandExecutor, TabCompleter {
         return ((((Damageable) victim).getHealth() - event.getFinalDamage()) <= 0);
     }
 
-    private void playSound(Player player, Sound sound, float volume, float pitch) {
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent e) {
+        Player p = e.getPlayer();
+        if (plugin.getConfig().getBoolean("notify-update") && p.hasPermission("hitsoundstf.notifyupdate")) {
+            UpdateCheck
+                    .of(plugin)
+                    .resourceId(Integer.parseInt(plugin.RESOURCE_ID))
+                    .handleResponse((versionResponse, version) -> {
+                        switch (versionResponse) {
+                            case FOUND_NEW:
+                                p.sendMessage("§6A new version of HitsoundsTF is available!§7 (" + version + ")");
+                                p.sendMessage("§6https://www.spigotmc.org/resources/hitsoundstf." + plugin.RESOURCE_ID + "/");
+                                break;
+                            case LATEST:
+                                //simply don't send a message
+                                break;
+                            case UNAVAILABLE:
+                                p.sendMessage(ChatColor.RED + "Unable to perform a version check for HitsoundsTF.");
+                        }
+                    }).check();
+        }
+    }
+
+    @Override
+    public List<String> onTabComplete(CommandSender commandSender, Command command, String s, String[] args) {
+        String[] commands = {"hitsounds", "hitsound", "hs"};
+        for (String alias : commands) {
+            if (command.getName().equalsIgnoreCase(alias)) {
+                //return an empty list to prevent playername filling
+                return new ArrayList<>();
+            }
+        }
+        return null;
+    }
+
+    @EventHandler
+    public void onEntityDamageByEntity(EntityDamageByEntityEvent e) {
+        boolean isFinalBlow = isFinalBlow(e);
+        Entity damager = e.getDamager();
+        switch (damager.getType()) {
+            case PLAYER:
+                break;
+            case ARROW:
+            case SPECTRAL_ARROW:
+            case TRIDENT:
+            case ENDER_PEARL:
+            case SNOWBALL:
+            case EGG:
+                //TODO return if shot integration is enabled
+                damager = (Player) ((Projectile) damager).getShooter();
+                break;
+            default:
+                return;
+        }
+
+        Player player = (Player) damager;
+        PlayerPreferences prefs = preferencesManager.get(player.getUniqueId());
+
+        //grace period while preferences are being fetched
+        if (prefs == null) return;
+
+
+        //if is final blow but killsounds are disabled
+        if (isFinalBlow && !prefs.getEnabled(true)) return;
+        //if hitsounds are disabled
+        if (!prefs.getEnabled(false)) return;
+
+        double damage = e.getFinalDamage();
+
+        Sound sound;
+        float volume;
+        float pitch;
+
+        //ignore if config says to, killsounds will always play
+        if (IGNORE_LOW && !isFinalBlow && damage < LOW_DAMAGE) return;
+        sound = prefs.getSound(isFinalBlow);
+        volume = prefs.getVolume(isFinalBlow);
+        pitch = calculateHitsoundPitch(damage, prefs.getLowDmgPitch(isFinalBlow), prefs.getHighDmgPitch(isFinalBlow), LOW_DAMAGE, HIGH_DAMAGE);
         player.playSound(player.getLocation(), sound, volume, pitch);
     }
 
-
     //TODO resourceID
     //TODO tracker for poison/fire damage using combatlogX api
-    //TODO better command structure, maybe even gui - smartinvs?
     //TODO test protocollib again for disable-vanilla-hitsounds - look at old github commits for clues
-    //TODO permissions for commands etc.
     //TODO crackshot integration - custom crit sounds - "throw" new event on crackshot event?
     //TODO neat video demo with captions and stuff
-    //TODO rounding float values
     //TODO customizing sound channel?
-    //TODO better error handling all around - eg grace period for first second of player joining server
-    //TODO better comments
+    //TODO better error handling all around
+    //TODO commodore
 }

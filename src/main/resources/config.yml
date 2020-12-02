@@ -13,11 +13,11 @@ use-mysql: false
 
 # Change these settings to connect to your MySQL database.
 # NOTE: Requires restart
-mysql-host: localhost
+mysql-host: host
 mysql-port: 3306
-mysql-username: root
-mysql-password: 1234
-mysql-database: javawork
+mysql-username: username
+mysql-password: password
+mysql-database: database
 
 # Should HitsoundsTF attempt to silence the vanilla "ding" hitsound?
 # (e.g. from landing cross/bow arrows on other players)
@@ -41,6 +41,10 @@ low-damage: 1.0
 # This should generally be much greater than low-damage. Adjust it to fit the gamemode.
 # NOTE: Requires restart
 high-damage: 20.0
+
+# Should attacks that deal less than low-damage be ignored?
+# This means that attacks that deal damage that is too low will not produce a hitsound.
+ignore-low-damage: false
 
 #Player preference defaults
 default-enable-hitsounds: true

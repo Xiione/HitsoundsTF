@@ -1,11 +1,10 @@
 package io.github.xiione.sql;
 
+import io.github.xiione.HitsoundsTFPlugin;
 import io.github.xiione.PlayerPreferences;
-import io.github.xiione.PlayerPreferencesManager;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -20,8 +19,8 @@ public class MySQL extends SQL {
     private final String password;
     private final String database;
 
-    public MySQL(JavaPlugin plugin, PlayerPreferencesManager preferencesManager) {
-        super(plugin, preferencesManager);
+    public MySQL(HitsoundsTFPlugin plugin) {
+        super(plugin);
 
         FileConfiguration config = plugin.getConfig();
         host = config.getString("mysql-host");
@@ -113,16 +112,16 @@ public class MySQL extends SQL {
                             "VALUES(" +
                             "'" + uuid.toString() + "', " +
                             "'" + player.getName() + "', " +
-                            (prefs.getEnableHitsounds() ? 1 : 0) + ", " +
-                            "'" + prefs.getHitsound().toString() + "', " +
-                            prefs.getHitsoundVolume() + ", " +
-                            prefs.getLowHitPitch() + ", " +
-                            prefs.getHighHitPitch() + ", " +
-                            (prefs.getEnableKillsounds() ? 1 : 0) + ", " +
-                            "'" + prefs.getKillsound().toString() + "', " +
-                            prefs.getKillsoundVolume() + ", " +
-                            prefs.getLowKillPitch() + ", " +
-                            prefs.getHighKillPitch() +
+                            prefs.getEnabled(false) + ", " +
+                            "'" + prefs.getSound(false) + "', " +
+                            prefs.getVolume(false) + ", " +
+                            prefs.getLowDmgPitch(false) + ", " +
+                            prefs.getHighDmgPitch(false) + ", " +
+                            prefs.getEnabled(true) + ", " +
+                            "'" + prefs.getSound(true) + "', " +
+                            prefs.getVolume(true) + ", " +
+                            prefs.getLowDmgPitch(true) + ", " +
+                            prefs.getHighDmgPitch(true) +
                             ") " +
 
                             "ON DUPLICATE KEY UPDATE " +
