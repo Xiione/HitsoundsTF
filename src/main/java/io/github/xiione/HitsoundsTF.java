@@ -168,13 +168,4 @@ public class HitsoundsTF implements Listener, TabCompleter {
         pitch = calculateHitsoundPitch(damage, prefs.getLowDmgPitch(isFinalBlow), prefs.getHighDmgPitch(isFinalBlow), LOW_DAMAGE, HIGH_DAMAGE);
         player.playSound(player.getLocation(), sound, volume, pitch);
     }
-
-    //TODO resourceID
-    //TODO tracker for poison/fire damage using combatlogX api
-    //TODO test protocollib again for disable-vanilla-hitsounds - look at old github commits for clues
-    //TODO crackshot integration - custom crit sounds - "throw" new event on crackshot event?
-    //TODO neat video demo with captions and stuff
-    //TODO customizing sound channel?
-    //TODO better error handling all around
-    //TODO commodore
 }
