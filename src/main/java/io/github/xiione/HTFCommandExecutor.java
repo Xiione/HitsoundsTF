@@ -5,16 +5,22 @@ import org.bukkit.Sound;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 
-public class HTFCommandExecutor implements CommandExecutor {
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+public class HTFCommandExecutor implements CommandExecutor, TabCompleter {
 
     private static final String ERROR_NO_SUCH_CMD = "§cUnknown subcommand!";
     private static final String ERROR_NO_PERMISSION = "§cNo permission!";
     private static final String ERROR_TOO_MANY_ARGS = "§cToo many arguments provided!";
     private static final String ERROR_TOO_FEW_ARGS = "§cToo few arguments provided!";
 
-    private static final String USAGE_HSO = "§cUsage: /hso <player> <hitsound | killsound> [<setting> <value>]";
+    private static final String USAGE_HSADMIN = "§cUsage: /hsadmin <player> <hitsound | killsound> [<setting> <value>]";
 
     private final HitsoundsTFPlugin plugin;
     private final PlayerPreferencesManager preferencesManager;
@@ -33,6 +39,7 @@ public class HTFCommandExecutor implements CommandExecutor {
                     sender.sendMessage("§6HitsoundsTF " + plugin.PLUGIN_VERSION + "§7 by Xiione");
                     sender.sendMessage("§7https://www.spigotmc.org/resources/hitsoundstf." + plugin.RESOURCE_ID + "/");
                     sender.sendMessage("§6Usage: §7/hitsoundstf [help|reload]");
+                    return true;
                 } else switch (args[0]) {
                     case "reload":
                         if (!sender.hasPermission("hitsoundstf.reload")) {
@@ -101,7 +108,7 @@ public class HTFCommandExecutor implements CommandExecutor {
 
                 if (!(sender instanceof Player)) {
                     sender.sendMessage("§cThis command can only be executed by an online player!");
-                    sender.sendMessage(USAGE_HSO);
+                    sender.sendMessage(USAGE_HSADMIN);
                     return true;
                 }
 
@@ -256,20 +263,20 @@ public class HTFCommandExecutor implements CommandExecutor {
                         return true;
                 }
             }
-            case "hso": {
-                if (!sender.hasPermission("hitsoundstf.set.others")) {
+            case "hsadmin": {
+                if (!sender.hasPermission("hitsoundstf.set.admin")) {
                     sender.sendMessage(ERROR_NO_PERMISSION);
                     return true;
                 }
                 if (args.length > 4) {
                     sender.sendMessage(ERROR_TOO_MANY_ARGS);
-                    sender.sendMessage(USAGE_HSO);
+                    sender.sendMessage(USAGE_HSADMIN);
                     return true;
                 }
 
                 if (args.length < 2) {
                     sender.sendMessage(ERROR_TOO_FEW_ARGS);
-                    sender.sendMessage(USAGE_HSO);
+                    sender.sendMessage(USAGE_HSADMIN);
                     return true;
                 }
                 Player target = Bukkit.getPlayerExact(args[0]);
@@ -289,7 +296,7 @@ public class HTFCommandExecutor implements CommandExecutor {
                         break;
                     default:
                         sender.sendMessage("§cInvalid argument!");
-                        sender.sendMessage(USAGE_HSO);
+                        sender.sendMessage(USAGE_HSADMIN);
                         return true;
                 }
 
@@ -336,7 +343,7 @@ public class HTFCommandExecutor implements CommandExecutor {
                     case "sound":
                         if (args.length < 4) {
                             sender.sendMessage(ERROR_TOO_FEW_ARGS);
-                            sender.sendMessage(USAGE_HSO);
+                            sender.sendMessage(USAGE_HSADMIN);
                             return true;
                         }
                         try {
@@ -352,7 +359,7 @@ public class HTFCommandExecutor implements CommandExecutor {
                     case "volume":
                         if (args.length < 4) {
                             sender.sendMessage(ERROR_TOO_FEW_ARGS);
-                            sender.sendMessage(USAGE_HSO);
+                            sender.sendMessage(USAGE_HSADMIN);
                             return true;
                         }
                         try {
@@ -370,7 +377,7 @@ public class HTFCommandExecutor implements CommandExecutor {
                     case "lowdmgpitch":
                         if (args.length < 4) {
                             sender.sendMessage(ERROR_TOO_FEW_ARGS);
-                            sender.sendMessage(USAGE_HSO);
+                            sender.sendMessage(USAGE_HSADMIN);
                             return true;
                         }
                         try {
@@ -389,7 +396,7 @@ public class HTFCommandExecutor implements CommandExecutor {
                     case "highdmgpitch":
                         if (args.length < 4) {
                             sender.sendMessage(ERROR_TOO_FEW_ARGS);
-                            sender.sendMessage(USAGE_HSO);
+                            sender.sendMessage(USAGE_HSADMIN);
                             return true;
                         }
                         try {
@@ -406,13 +413,56 @@ public class HTFCommandExecutor implements CommandExecutor {
                         }
                     default:
                         sender.sendMessage("§cUnknown setting!");
-                        sender.sendMessage(USAGE_HSO);
+                        sender.sendMessage(USAGE_HSADMIN);
                         return true;
                 }
             }
             default: {
                 sender.sendMessage(ERROR_NO_SUCH_CMD);
                 return true;
+            }
+        }
+    }
+
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+        String name = command.getName();
+        switch (name) {
+            default:
+            case "hitsoundstf":
+                return Collections.emptyList();
+            case "hitsound":
+            case "killsound": {
+                if (args.length > 2)
+                    return Collections.emptyList();
+
+                if (args.length == 0)
+                    return Collections.emptyList();
+
+                if (args[0].equals("sound")) {
+                    return Stream.of(Sound.values()).map(Sound::name).collect(Collectors.toList());
+                }
+            }
+            case "hsadmin": {
+                if (args.length > 4)
+                    return Collections.emptyList();
+
+                if (args.length == 0 || args.length == 1)
+                    return null;
+
+                if (args.length == 2)
+                    return Collections.emptyList();
+
+                switch (args[2]) {
+                    case "sound":
+                        return Stream.of(Sound.values()).map(Sound::name).collect(Collectors.toList());
+                    case "toggle":
+                    case "volume":
+                    case "lowdmgpitch":
+                    case "highdmgpitch":
+                    default:
+                        return Collections.emptyList();
+                }
             }
         }
     }

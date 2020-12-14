@@ -14,7 +14,7 @@ commands:
   killsound:
     description: Modify personal killsound settings
     aliases: [ ks ]
-  hso:
+  hsadmin:
     description: Modify other online players' settings
 
 
@@ -32,7 +32,7 @@ permissions:
     description: Permission to reload plugin configuration
   hitsoundstf.notifyupdate:
     description: Permission to receive notification when plugin is outdated
-  hitsoundstf.set.others:
+  hitsoundstf.set.admin:
     description: Permission to modify all the settings of other players
   hitsoundstf.set.all:
     description: Permission to modify all personal killsound settings

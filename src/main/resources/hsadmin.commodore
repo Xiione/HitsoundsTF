@@ -1,0 +1,41 @@
+hsadmin {
+    player brigadier:string single_word {
+        hitsound {
+            toggle {
+                    on;
+                    off;
+                }
+            sound {
+                SOUND_EFFECT brigadier:string single_word;
+            }
+            volume {
+                volume brigadier:float;
+            }
+            lowdmgpitch {
+                pitch brigadier:float;
+            }
+            highdmgpitch {
+                pitch brigadier:float;
+            }
+        }
+        killsound {
+            toggle {
+                    on;
+                    off;
+            }
+            sound {
+                SOUND_EFFECT brigadier:string single_word;
+            }
+            volume {
+                volume brigadier:float;
+            }
+            lowdmgpitch {
+                pitch brigadier:float;
+            }
+            highdmgpitch {
+                pitch brigadier:float;
+            }
+        }
+    }
+
+}

@@ -2,9 +2,6 @@ package io.github.xiione;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -15,10 +12,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class HitsoundsTF implements Listener, TabCompleter {
+public class HitsoundsTF implements Listener {
 
     private final double LOW_DAMAGE;
     private final double HIGH_DAMAGE;
@@ -111,18 +105,6 @@ public class HitsoundsTF implements Listener, TabCompleter {
         }
     }
 
-    @Override
-    public List<String> onTabComplete(CommandSender commandSender, Command command, String s, String[] args) {
-        String[] commands = {"hitsounds", "hitsound", "hs"};
-        for (String alias : commands) {
-            if (command.getName().equalsIgnoreCase(alias)) {
-                //return an empty list to prevent playername filling
-                return new ArrayList<>();
-            }
-        }
-        return null;
-    }
-
     @EventHandler
     public void onEntityDamageByEntity(EntityDamageByEntityEvent e) {
         boolean isFinalBlow = isFinalBlow(e);
@@ -163,9 +145,18 @@ public class HitsoundsTF implements Listener, TabCompleter {
 
         //ignore if config says to, killsounds will always play
         if (IGNORE_LOW && !isFinalBlow && damage < LOW_DAMAGE) return;
+
         sound = prefs.getSound(isFinalBlow);
         volume = prefs.getVolume(isFinalBlow);
         pitch = calculateHitsoundPitch(damage, prefs.getLowDmgPitch(isFinalBlow), prefs.getHighDmgPitch(isFinalBlow), LOW_DAMAGE, HIGH_DAMAGE);
         player.playSound(player.getLocation(), sound, volume, pitch);
     }
+    //TODO resourceID
+    //TODO tracker for poison/fire damage using combatlogX api
+    //TODO test protocollib again for disable-vanilla-hitsounds - look at old github commits for clues
+    //TODO crackshot integration - custom crit sounds - "throw" new event on crackshot event?
+    //TODO neat video demo with captions and stuff
+    //TODO customizing sound channel?
+    //TODO better error handling all around
+    //TODO saving settings on server stop - use sync operation
 }

@@ -40,19 +40,30 @@ public class HitsoundsTFPlugin extends JavaPlugin {
     public void onEnable() {
         this.reloadConfigs();
 
-        PluginCommand hitsoundstfCommand = this.getCommand("hitsoundstf");
-        PluginCommand hitsoundCommand = this.getCommand("hitsound");
-        PluginCommand killsoundCommand = this.getCommand("killsound");
-        PluginCommand hsoCommand = this.getCommand("hso");
+        PluginCommand htfCmd = this.getCommand("hitsoundstf");
+        PluginCommand hsCmd = this.getCommand("hitsound");
+        PluginCommand ksCmd = this.getCommand("killsound");
+        PluginCommand hsaCmd = this.getCommand("hsadmin");
 
-        hitsoundstfCommand.setExecutor(this.commandExecutor);
-        hitsoundCommand.setExecutor(this.commandExecutor);
-        killsoundCommand.setExecutor(this.commandExecutor);
-        hsoCommand.setExecutor(this.commandExecutor);
+        htfCmd.setTabCompleter(this.commandExecutor);
+        hsCmd.setTabCompleter(this.commandExecutor);
+        ksCmd.setTabCompleter(this.commandExecutor);
+        hsaCmd.setTabCompleter(this.commandExecutor);
+
+        htfCmd.setExecutor(this.commandExecutor);
+        hsCmd.setExecutor(this.commandExecutor);
+        ksCmd.setExecutor(this.commandExecutor);
+        hsaCmd.setExecutor(this.commandExecutor);
         if (CommodoreProvider.isSupported()) {
             Commodore commodore = CommodoreProvider.getCommodore(this);
             try {
-                LiteralCommandNode<?> commodoreFile = CommodoreFileFormat.parse(this.getResource("hitsounds.commodore"));
+                LiteralCommandNode<?> htfFile = CommodoreFileFormat.parse(this.getResource("hitsoundstf.commodore"));
+                LiteralCommandNode<?> hsksFile = CommodoreFileFormat.parse(this.getResource("hitsound.commodore"));
+                LiteralCommandNode<?> hsaFile = CommodoreFileFormat.parse(this.getResource("hsadmin.commodore"));
+                commodore.register(htfCmd, htfFile);
+                commodore.register(hsCmd, hsksFile);
+                commodore.register(ksCmd, hsksFile);
+                commodore.register(hsaCmd, hsaFile);
             } catch (IOException e) {
                 e.printStackTrace();
             }
