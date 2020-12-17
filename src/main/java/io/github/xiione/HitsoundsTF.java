@@ -158,5 +158,5 @@ public class HitsoundsTF implements Listener {
     //TODO neat video demo with captions and stuff
     //TODO customizing sound channel?
     //TODO better error handling all around
-    //TODO saving settings on server stop - use sync operation
+    //TODO hsadmin and hs together - array manipulation to shift elements?
 }

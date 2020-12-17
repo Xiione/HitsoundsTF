@@ -76,7 +76,7 @@ public class HTFCommandExecutor implements CommandExecutor, TabCompleter {
                                 sender.sendMessage("§6HitsoundsTF help - page 2");
                                 sender.sendMessage("§7/hitsound toggle [on|off]§f: Toggle your hitsound on and off.");
                                 sender.sendMessage("§7/hitsound sound <SOUND_EFFECT>§f: Change your hitsound sound effect.");
-                                sender.sendMessage("§7/hitsound volume <volume>§f: Change your hitsound volume. Can range from 0.0 to 1.0.");
+                                sender.sendMessage("§7/hitsound volume <volume>§f: Change your hitsound volume. Can range from 0.0 to 10.0.");
                                 sender.sendMessage("§7/hitsound lowdmgpitch <pitch>§f: Change the lower bound for hitsound pitch. Can range from 0.5 to 2.0.");
                                 sender.sendMessage("§7/hitsound highdmgpitch <pitch>§f: Change the upper bound for hitsound pitch. Can range from 0.5 to 2.0.");
                                 sender.sendMessage("§6/hitsoundstf help 3 for more help");
@@ -86,7 +86,7 @@ public class HTFCommandExecutor implements CommandExecutor, TabCompleter {
                                 sender.sendMessage("§6HitsoundsTF help - page 3");
                                 sender.sendMessage("§7/killsound toggle [on|off]§f: Toggle your killsound on and off.");
                                 sender.sendMessage("§7/killsound sound <SOUND_EFFECT>§f: Change your killsound sound effect.");
-                                sender.sendMessage("§7/killsound volume <volume>§f: Change your killsound volume. Can range from 0.0 to 1.0.");
+                                sender.sendMessage("§7/killsound volume <volume>§f: Change your killsound volume. Can range from 0.0 to 10.0.");
                                 sender.sendMessage("§7/killsound lowdmgpitch <pitch>§f: Change the lower bound for killsound pitch. Can range from 0.5 to 2.0.");
                                 sender.sendMessage("§7/killsound highdmgpitch <pitch>§f: Change the upper bound for killsound pitch. Can range from 0.5 to 2.0.");
                                 sender.sendMessage("§6/hitsoundstf help 1 to return to page 1");
@@ -198,8 +198,9 @@ public class HTFCommandExecutor implements CommandExecutor, TabCompleter {
                             }
                             //round volume to nearest thousandth
                             volume = Math.round(volume * 1000) / 1000f;
-                            //must be positive
+                            //must be positive and between 0 and 10
                             volume = volume > 0 ? volume : 0f;
+                            volume = volume < 10 ? volume : 10f;
                             prefs.setVolume(volume, k);
                             sender.sendMessage("§fChanged " + name + " volume to §6" + volume);
                             return true;
@@ -366,6 +367,7 @@ public class HTFCommandExecutor implements CommandExecutor, TabCompleter {
                             float volume = Float.parseFloat(args[1]);
                             volume = Math.round(volume * 1000) / 1000f;
                             volume = volume > 0 ? volume : 0f;
+                            volume = volume < 10 ? volume : 10f;
                             prefs.setVolume(volume, k);
                             sender.sendMessage("§fChanged §6" + target.getName() + "§f's " + name + " volume to §6" + volume);
                             return true;

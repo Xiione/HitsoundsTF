@@ -96,59 +96,45 @@ public class MySQL extends SQL {
         }
     }
 
-    public void savePlayerPreferences(Player player) {
+    String createUpdateQuery(Player player) {
         UUID uuid = player.getUniqueId();
 
         PlayerPreferences prefs = this.preferencesManager.get(uuid);
-        if (prefs == null) return;
+        if (prefs == null) return null;
 
         //don't save to database if no settings changed while player was online
         if (prefs.changesMade()) {
-            String query =
-                    "INSERT INTO hitsoundstf_preferences " +
-                            "(uuid, name, enable_hitsounds, hitsound, hitsound_volume, low_hit_pitch, high_hit_pitch, " +
-                            "enable_killsounds, killsound, killsound_volume, low_kill_pitch, high_kill_pitch) " +
+            return "INSERT INTO hitsoundstf_preferences " +
+                    "(uuid, name, enable_hitsounds, hitsound, hitsound_volume, low_hit_pitch, high_hit_pitch, " +
+                    "enable_killsounds, killsound, killsound_volume, low_kill_pitch, high_kill_pitch) " +
 
-                            "VALUES(" +
-                            "'" + uuid.toString() + "', " +
-                            "'" + player.getName() + "', " +
-                            prefs.getEnabled(false) + ", " +
-                            "'" + prefs.getSound(false) + "', " +
-                            prefs.getVolume(false) + ", " +
-                            prefs.getLowDmgPitch(false) + ", " +
-                            prefs.getHighDmgPitch(false) + ", " +
-                            prefs.getEnabled(true) + ", " +
-                            "'" + prefs.getSound(true) + "', " +
-                            prefs.getVolume(true) + ", " +
-                            prefs.getLowDmgPitch(true) + ", " +
-                            prefs.getHighDmgPitch(true) +
-                            ") " +
+                    "VALUES(" +
+                    "'" + uuid.toString() + "', " +
+                    "'" + player.getName() + "', " +
+                    prefs.getEnabled(false) + ", " +
+                    "'" + prefs.getSound(false) + "', " +
+                    prefs.getVolume(false) + ", " +
+                    prefs.getLowDmgPitch(false) + ", " +
+                    prefs.getHighDmgPitch(false) + ", " +
+                    prefs.getEnabled(true) + ", " +
+                    "'" + prefs.getSound(true) + "', " +
+                    prefs.getVolume(true) + ", " +
+                    prefs.getLowDmgPitch(true) + ", " +
+                    prefs.getHighDmgPitch(true) +
+                    ") " +
 
-                            "ON DUPLICATE KEY UPDATE " +
-                            "enable_hitsounds = VALUES(enable_hitsounds), " +
-                            "hitsound = VALUES(hitsound), " +
-                            "hitsound_volume = VALUES(hitsound_volume), " +
-                            "low_hit_pitch = VALUES(low_hit_pitch), " +
-                            "high_hit_pitch = VALUES(high_hit_pitch), " +
-                            "enable_killsounds = VALUES(enable_killsounds), " +
-                            "killsound = VALUES(killsound), " +
-                            "killsound_volume = VALUES(killsound_volume), " +
-                            "low_kill_pitch = VALUES(low_kill_pitch), " +
-                            "high_kill_pitch = VALUES(high_kill_pitch)";
-
-            this.executeUpdateAsync(query, statement -> {
-                try {
-                    if (statement == null || !statement.isClosed())
-                        throw new SQLException();
-                } catch (SQLException e) {
-                    plugin.getLogger().warning("Failed to save preferences for player " + player.getName());
-                }
-            });
+                    "ON DUPLICATE KEY UPDATE " +
+                    "enable_hitsounds = VALUES(enable_hitsounds), " +
+                    "hitsound = VALUES(hitsound), " +
+                    "hitsound_volume = VALUES(hitsound_volume), " +
+                    "low_hit_pitch = VALUES(low_hit_pitch), " +
+                    "high_hit_pitch = VALUES(high_hit_pitch), " +
+                    "enable_killsounds = VALUES(enable_killsounds), " +
+                    "killsound = VALUES(killsound), " +
+                    "killsound_volume = VALUES(killsound_volume), " +
+                    "low_kill_pitch = VALUES(low_kill_pitch), " +
+                    "high_kill_pitch = VALUES(high_kill_pitch)";
         }
-
-        //finally uncache playerprefs
-        this.preferencesManager.remove(uuid);
+        return null;
     }
-
-
 }

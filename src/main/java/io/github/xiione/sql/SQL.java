@@ -22,9 +22,8 @@ import java.util.function.Consumer;
 public abstract class SQL implements Listener {
 
     final JavaPlugin plugin;
-    Connection connection;
-
     final PlayerPreferencesManager preferencesManager;
+    Connection connection;
 
     public SQL(HitsoundsTFPlugin plugin) {
         this.plugin = plugin;
@@ -35,7 +34,7 @@ public abstract class SQL implements Listener {
 
     public abstract void createTable();
 
-    public abstract void savePlayerPreferences(Player player);
+    abstract String createUpdateQuery(Player player);
 
     void executeQueryAsync(String query, Consumer<ResultSet> consumer) {
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
@@ -81,12 +80,12 @@ public abstract class SQL implements Listener {
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
-        savePlayerPreferences(event.getPlayer());
+        savePlayerPreferences(event.getPlayer(), false);
     }
 
     @EventHandler
     public void onPlayerKick(PlayerKickEvent event) {
-        savePlayerPreferences(event.getPlayer());
+        savePlayerPreferences(event.getPlayer(), false);
     }
 
     public void fetchPlayerPreferences(Player player) {
@@ -115,5 +114,33 @@ public abstract class SQL implements Listener {
                 plugin.getLogger().warning("Failed to fetch preferences for player " + player.getName());
             }
         });
+    }
+
+    public void savePlayerPreferences(Player player, boolean sync) {
+        String query = createUpdateQuery(player);
+        if (query != null) {
+            if (sync) {
+                synchronized (this) {
+                    try {
+                        Statement statement = connection.createStatement();
+                        statement.executeUpdate(query);
+                        statement.close();
+                    } catch (SQLException e) {
+                        plugin.getLogger().warning("Failed to save preferences for player " + player.getName());
+                    }
+                }
+            } else {
+                this.executeUpdateAsync(query, statement -> {
+                    try {
+                        if (statement == null || !statement.isClosed())
+                            throw new SQLException();
+                    } catch (SQLException e) {
+                        plugin.getLogger().warning("Failed to save preferences for player " + player.getName());
+                    }
+                });
+            }
+        }
+        //finally uncache playerprefs
+        this.preferencesManager.remove(player.getUniqueId());
     }
 }

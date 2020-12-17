@@ -87,11 +87,13 @@ public class HitsoundsTFPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        this.getLogger().info("Saving online player preferences...");
         if (sql.getConnection() != null) {
             for (Player player : Bukkit.getOnlinePlayers()) {
-                sql.savePlayerPreferences(player);
+                sql.savePlayerPreferences(player, true);
             }
         }
+        this.getLogger().info("Until next time!");
     }
 
     public void reloadConfigs() {
