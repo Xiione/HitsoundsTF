@@ -8,6 +8,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,7 +21,7 @@ public class HTFCommandExecutor implements CommandExecutor, TabCompleter {
     private static final String ERROR_TOO_MANY_ARGS = "§cToo many arguments provided!";
     private static final String ERROR_TOO_FEW_ARGS = "§cToo few arguments provided!";
 
-    private static final String USAGE_HSADMIN = "§cUsage: /hsadmin <player> <hitsound | killsound> [<setting> <value>]";
+    private static final String USAGE_HSADMIN = "§cUsage: /hsadmin <player> <hitsound|killsound> [<setting> <value>]";
 
     private final HitsoundsTFPlugin plugin;
     private final PlayerPreferencesManager preferencesManager;
@@ -33,6 +34,10 @@ public class HTFCommandExecutor implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String alias, String[] args) {
         String name = command.getName();
+
+        boolean a = false;
+        Player target = null;
+
         switch (name) {
             case "hitsoundstf": {
                 if (args.length == 0) {
@@ -41,7 +46,7 @@ public class HTFCommandExecutor implements CommandExecutor, TabCompleter {
                     sender.sendMessage("§6Usage: §7/hitsoundstf [help|reload]");
                     return true;
                 } else switch (args[0]) {
-                    case "reload":
+                    case "reload": {
                         if (!sender.hasPermission("hitsoundstf.reload")) {
                             sender.sendMessage(ERROR_NO_PERMISSION);
                             return true;
@@ -53,7 +58,8 @@ public class HTFCommandExecutor implements CommandExecutor, TabCompleter {
                         plugin.reloadConfigs();
                         sender.sendMessage("§aHitsoundsTF config reloaded!");
                         return true;
-                    case "help":
+                    }
+                    case "help": {
                         if (args.length > 2) {
                             sender.sendMessage(ERROR_TOO_MANY_ARGS);
                             return true;
@@ -97,174 +103,15 @@ public class HTFCommandExecutor implements CommandExecutor, TabCompleter {
                                 break;
                         }
                         return true;
-                    default:
+                    }
+                    default: {
                         sender.sendMessage(ERROR_NO_SUCH_CMD);
                         return true;
-                }
-            }
-            case "hitsound":
-            case "killsound": {
-                boolean k = name.equals("killsound");
-
-                if (!(sender instanceof Player)) {
-                    sender.sendMessage("§cThis command can only be executed by an online player!");
-                    sender.sendMessage(USAGE_HSADMIN);
-                    return true;
-                }
-
-                if (args.length > 2) {
-                    sender.sendMessage(ERROR_TOO_MANY_ARGS);
-                    sender.sendMessage("§cUsage: /" + alias + " <setting> <value>");
-                    return true;
-                }
-
-                PlayerPreferences prefs = preferencesManager.get(((Player) sender).getUniqueId());
-
-                if (prefs == null) {
-                    sender.sendMessage("§cAn error occurred while fetching your " + name + " preferences!");
-                    sender.sendMessage("§cRejoin the server and try again, or contact a server administrator.");
-                    return true;
-                }
-
-                if (args.length == 0) {
-                    sender.sendMessage("§6" + sender.getName() + "'s " + name + " preferences");
-                    sender.sendMessage("§fEnabled: §6" + prefs.getEnabled(k));
-                    sender.sendMessage("§fSound: §6" + prefs.getSound(k).toString());
-                    sender.sendMessage("§fVolume: §6" + prefs.getVolume(k));
-                    sender.sendMessage("§fLow damage pitch: §6" + prefs.getLowDmgPitch(k));
-                    sender.sendMessage("§fHigh damage pitch: §6" + prefs.getHighDmgPitch(k));
-                    return true;
-                }
-
-                switch (args[0]) {
-                    case "toggle":
-                        if (!sender.hasPermission("hitsoundstf." + name + ".toggle")) {
-                            sender.sendMessage(ERROR_NO_PERMISSION);
-                            return true;
-                        }
-                        if (args.length == 1) {
-                            boolean was = prefs.getEnabled(k);
-                            prefs.setEnabled(!was, k);
-                            sender.sendMessage("§fToggled " + name + " §6" + (was ? "OFF" : "ON"));
-                            return true;
-                        }
-                        switch (args[1]) {
-                            case "on":
-                                prefs.setEnabled(true, k);
-                                sender.sendMessage("§fToggled " + name + " §6ON");
-                                break;
-                            case "off":
-                                prefs.setEnabled(false, k);
-                                sender.sendMessage("§fToggled " + name + " §6OFF");
-                                break;
-                            default:
-                                sender.sendMessage("§cInvalid value!");
-                                sender.sendMessage("§cUsage: /" + alias + " toggle [on|off]");
-                                break;
-                        }
-                        return true;
-
-                    case "sound":
-                        if (args.length < 2) {
-                            sender.sendMessage(ERROR_TOO_FEW_ARGS);
-                            sender.sendMessage("§cUsage: /" + alias + " <setting> <value>");
-                            return true;
-                        }
-                        try {
-                            Sound sound = Sound.valueOf(args[1]);
-                            if (!sender.hasPermission("hitsoundstf." + name + ".sound." + sound)) {
-                                sender.sendMessage("§cYou don't have permission to use " + sound + "!");
-                                return true;
-                            }
-                            prefs.setSound(sound, k);
-                            sender.sendMessage("§fChanged " + name + " to §6" + sound);
-                            return true;
-                        } catch (IllegalArgumentException e) {
-                            sender.sendMessage("§cInvalid sound effect!");
-                            return true;
-                        }
-
-                    case "volume":
-                        if (args.length < 2) {
-                            sender.sendMessage(ERROR_TOO_FEW_ARGS);
-                            sender.sendMessage("§cUsage: /" + alias + " <setting> <value>");
-                            return true;
-                        }
-                        try {
-                            float volume = Float.parseFloat(args[1]);
-                            if (!sender.hasPermission("hitsoundstf." + name + ".volume")) {
-                                sender.sendMessage("§cYou don't have permission to change your " + name + " volume!");
-                                return true;
-                            }
-                            //round volume to nearest thousandth
-                            volume = Math.round(volume * 1000) / 1000f;
-                            //must be positive and between 0 and 10
-                            volume = volume > 0 ? volume : 0f;
-                            volume = volume < 10 ? volume : 10f;
-                            prefs.setVolume(volume, k);
-                            sender.sendMessage("§fChanged " + name + " volume to §6" + volume);
-                            return true;
-                        } catch (NumberFormatException e) {
-                            sender.sendMessage("§cInvalid float value!");
-                            return true;
-                        }
-
-                    case "lowdmgpitch":
-                        if (args.length < 2) {
-                            sender.sendMessage(ERROR_TOO_FEW_ARGS);
-                            sender.sendMessage("§cUsage: /" + alias + " <setting> <value>");
-                            return true;
-                        }
-                        try {
-                            float pitch = Float.parseFloat(args[1]);
-                            if (!sender.hasPermission("hitsoundstf." + name + ".lowdmgpitch")) {
-                                sender.sendMessage("§cYou don't have permission to change your " + name + " low damage pitch!");
-                                return true;
-                            }
-                            //round pitch to nearest thousandth
-                            pitch = Math.round(pitch * 1000) / 1000f;
-                            //must be between 0.5 and 2.0
-                            pitch = pitch > 0.5 ? pitch : 0.5f;
-                            pitch = pitch < 2.0 ? pitch : 2.0f;
-                            prefs.setLowDmgPitch(pitch, k);
-                            sender.sendMessage("§fChanged " + name + " low damage pitch to §6" + pitch);
-                            return true;
-                        } catch (NumberFormatException e) {
-                            sender.sendMessage("§cInvalid float value!");
-                            return true;
-                        }
-
-                    case "highdmgpitch":
-                        if (args.length < 2) {
-                            sender.sendMessage(ERROR_TOO_FEW_ARGS);
-                            sender.sendMessage("§cUsage: /" + alias + " <setting> <value>");
-                            return true;
-                        }
-                        try {
-                            float pitch = Float.parseFloat(args[1]);
-                            if (!sender.hasPermission("hitsoundstf." + name + ".highdmgpitch")) {
-                                sender.sendMessage("§cYou don't have permission to change your " + name + " high damage pitch!");
-                                return true;
-                            }
-                            //round pitch to nearest thousandth
-                            pitch = Math.round(pitch * 1000) / 1000f;
-                            //must be between 0.5 and 2.0
-                            pitch = pitch > 0.5 ? pitch : 0.5f;
-                            pitch = pitch < 2.0 ? pitch : 2.0f;
-                            prefs.setHighDmgPitch(pitch, k);
-                            sender.sendMessage("§fChanged " + name + " high damage pitch to §6" + pitch);
-                            return true;
-                        } catch (NumberFormatException e) {
-                            sender.sendMessage("§cInvalid float value!");
-                            return true;
-                        }
-                    default:
-                        sender.sendMessage("§cUnknown setting!");
-                        sender.sendMessage("§cUsage: /" + alias + " <setting> <value>");
-                        return true;
+                    }
                 }
             }
             case "hsadmin": {
+                a = true;
                 if (!sender.hasPermission("hitsoundstf.set.admin")) {
                     sender.sendMessage(ERROR_NO_PERMISSION);
                     return true;
@@ -280,20 +127,16 @@ public class HTFCommandExecutor implements CommandExecutor, TabCompleter {
                     sender.sendMessage(USAGE_HSADMIN);
                     return true;
                 }
-                Player target = Bukkit.getPlayerExact(args[0]);
+                target = Bukkit.getPlayerExact(args[0]);
                 if (target == null) {
                     sender.sendMessage("§cPlayer " + args[0] + " not found!");
                     return true;
                 }
 
-                boolean k;
                 name = args[1];
-                switch (args[1]) {
+                switch (name) {
                     case "hitsound":
-                        k = false;
-                        break;
                     case "killsound":
-                        k = true;
                         break;
                     default:
                         sender.sendMessage("§cInvalid argument!");
@@ -301,15 +144,40 @@ public class HTFCommandExecutor implements CommandExecutor, TabCompleter {
                         return true;
                 }
 
-                PlayerPreferences prefs = preferencesManager.get(target.getUniqueId());
+                //target and hit/kill set
+                //shift args over two indices
+                args = Arrays.copyOfRange(args, 2, args.length);
+            }
+            case "hitsound":
+            case "killsound": {
+                boolean k = name.equals("killsound");
 
-                if (prefs == null) {
-                    sender.sendMessage("§cAn error occurred while fetching player" + target.getName() + "'s preferences!");
+                if (!(sender instanceof Player || a)) {
+                    sender.sendMessage("§cThis command can only be executed by an online player!");
+                    sender.sendMessage(USAGE_HSADMIN);
                     return true;
                 }
 
-                if (args.length == 2) {
-                    sender.sendMessage("§6" + target.getName() + "'s " + name + " preferences");
+                if (args.length > 2) {
+                    sender.sendMessage(ERROR_TOO_MANY_ARGS);
+                    sender.sendMessage("§cUsage: /" + alias + " <setting> <value>");
+                    return true;
+                }
+
+                PlayerPreferences prefs = preferencesManager.get((a ? target : (Player) sender).getUniqueId());
+
+                if (prefs == null) {
+                    if (a) {
+                        sender.sendMessage("§cAn error occurred while fetching player" + target.getName() + "'s preferences!");
+                        return true;
+                    }
+                    sender.sendMessage("§cAn error occurred while fetching your " + name + " preferences!");
+                    sender.sendMessage("§cRejoin the server and try again, or contact a server administrator.");
+                    return true;
+                }
+
+                if (args.length == 0) {
+                    sender.sendMessage("§6" + (a ? target : (Player) sender).getName() + "'s " + name + " preferences");
                     sender.sendMessage("§fEnabled: §6" + prefs.getEnabled(k));
                     sender.sendMessage("§fSound: §6" + prefs.getSound(k).toString());
                     sender.sendMessage("§fVolume: §6" + prefs.getVolume(k));
@@ -318,105 +186,128 @@ public class HTFCommandExecutor implements CommandExecutor, TabCompleter {
                     return true;
                 }
 
-                switch (args[2]) {
-                    case "toggle":
-                        if (args.length == 3) {
-                            boolean was = prefs.getEnabled(k);
-                            prefs.setEnabled(!was, k);
-                            sender.sendMessage("§fToggled §6" + target.getName() + "§f's " + name + " §6" + (was ? "OFF" : "ON"));
+                switch (args[0]) {
+                    case "toggle": {
+                        if (!(sender.hasPermission("hitsoundstf." + name + ".toggle") || a)) {
+                            sender.sendMessage(ERROR_NO_PERMISSION);
                             return true;
                         }
-                        switch (args[3]) {
+                        if (args.length == 1) {
+                            boolean was = prefs.getEnabled(k);
+                            prefs.setEnabled(!was, k);
+                            if (a)
+                                sender.sendMessage("§fToggled §6" + target.getName() + "§f's " + name + " §6" + (was ? "OFF" : "ON"));
+                            else sender.sendMessage("§fToggled " + name + " §6" + (was ? "OFF" : "ON"));
+                            return true;
+                        }
+                        switch (args[1]) {
                             case "on":
                                 prefs.setEnabled(true, k);
-                                sender.sendMessage("§fToggled §6" + target.getName() + "§f's " + name + " §6ON");
+                                if (a) sender.sendMessage("§fToggled §6" + target.getName() + "§f's " + name + " §6ON");
+                                else sender.sendMessage("§fToggled " + name + " §6ON");
                                 break;
                             case "off":
                                 prefs.setEnabled(false, k);
-                                sender.sendMessage("§fToggled §6" + target.getName() + "§f's " + name + " §6OFF");
+                                if (a)
+                                    sender.sendMessage("§fToggled §6" + target.getName() + "§f's " + name + " §6OFF");
+                                else sender.sendMessage("§fToggled " + name + " §6OFF");
                                 break;
                             default:
                                 sender.sendMessage("§cInvalid value!");
+                                if (!a) sender.sendMessage("§cUsage: /" + alias + " toggle [on|off]");
                                 break;
                         }
                         return true;
-
-                    case "sound":
-                        if (args.length < 4) {
+                    }
+                    case "sound": {
+                        if (args.length < 2) {
                             sender.sendMessage(ERROR_TOO_FEW_ARGS);
-                            sender.sendMessage(USAGE_HSADMIN);
+                            if (!a) sender.sendMessage("§cUsage: /" + alias + " <setting> <value>");
                             return true;
                         }
                         try {
                             Sound sound = Sound.valueOf(args[1]);
+                            if (!(sender.hasPermission("hitsoundstf." + name + ".sound." + sound) || a)) {
+                                sender.sendMessage("§cYou don't have permission to use " + sound + "!");
+                                return true;
+                            }
                             prefs.setSound(sound, k);
-                            sender.sendMessage("§fChanged §6" + target.getName() + "§f's " + name + " to §6" + sound);
+                            if (a)
+                                sender.sendMessage("§fChanged §6" + target.getName() + "§f's " + name + " to §6" + sound);
+                            else sender.sendMessage("§fChanged " + name + " to §6" + sound);
                             return true;
                         } catch (IllegalArgumentException e) {
                             sender.sendMessage("§cInvalid sound effect!");
                             return true;
                         }
-
-                    case "volume":
-                        if (args.length < 4) {
+                    }
+                    case "volume": {
+                        if (args.length < 2) {
                             sender.sendMessage(ERROR_TOO_FEW_ARGS);
-                            sender.sendMessage(USAGE_HSADMIN);
+                            if (!a) sender.sendMessage("§cUsage: /" + alias + " <setting> <value>");
                             return true;
                         }
                         try {
                             float volume = Float.parseFloat(args[1]);
+                            if (!(sender.hasPermission("hitsoundstf." + name + ".volume") || a)) {
+                                sender.sendMessage("§cYou don't have permission to change your " + name + " volume!");
+                                return true;
+                            }
+                            //round volume to nearest thousandth
                             volume = Math.round(volume * 1000) / 1000f;
+                            //must be positive and between 0 and 10
                             volume = volume > 0 ? volume : 0f;
                             volume = volume < 10 ? volume : 10f;
                             prefs.setVolume(volume, k);
-                            sender.sendMessage("§fChanged §6" + target.getName() + "§f's " + name + " volume to §6" + volume);
+                            if (a)
+                                sender.sendMessage("§fChanged §6" + target.getName() + "§f's " + name + " volume to §6" + volume);
+                            else sender.sendMessage("§fChanged " + name + " volume to §6" + volume);
                             return true;
                         } catch (NumberFormatException e) {
                             sender.sendMessage("§cInvalid float value!");
                             return true;
                         }
-
+                    }
                     case "lowdmgpitch":
-                        if (args.length < 4) {
-                            sender.sendMessage(ERROR_TOO_FEW_ARGS);
-                            sender.sendMessage(USAGE_HSADMIN);
-                            return true;
-                        }
-                        try {
-                            float pitch = Float.parseFloat(args[1]);
-                            pitch = Math.round(pitch * 1000) / 1000f;
-                            pitch = pitch > 0.5 ? pitch : 0.5f;
-                            pitch = pitch < 2.0 ? pitch : 2.0f;
-                            prefs.setLowDmgPitch(pitch, k);
-                            sender.sendMessage("§fChanged §6" + target.getName() + "§f's " + name + " low damage pitch to §6" + pitch);
-                            return true;
-                        } catch (NumberFormatException e) {
-                            sender.sendMessage("§cInvalid float value!");
-                            return true;
-                        }
+                    case "highdmgpitch": {
+                        boolean h = args[0].equals("highdmgpitch");
 
-                    case "highdmgpitch":
-                        if (args.length < 4) {
+                        if (args.length < 2) {
                             sender.sendMessage(ERROR_TOO_FEW_ARGS);
-                            sender.sendMessage(USAGE_HSADMIN);
+                            if (!a) sender.sendMessage("§cUsage: /" + alias + " <setting> <value>");
                             return true;
                         }
                         try {
                             float pitch = Float.parseFloat(args[1]);
+                            if (!(sender.hasPermission("hitsoundstf." + name + "." + (h ? "high" : "low") + "dmgpitch") || a)) {
+                                sender.sendMessage("§cYou don't have permission to change your " + name + " " +
+                                        (h ? "high" : "low") + " damage pitch !");
+                                return true;
+                            }
+                            //round pitch to nearest thousandth
                             pitch = Math.round(pitch * 1000) / 1000f;
+                            //must be between 0.5 and 2.0
                             pitch = pitch > 0.5 ? pitch : 0.5f;
                             pitch = pitch < 2.0 ? pitch : 2.0f;
-                            prefs.setHighDmgPitch(pitch, k);
-                            sender.sendMessage("§fChanged §6" + target.getName() + "§f's " + name + " high damage pitch to §6" + pitch);
+
+                            if (h) prefs.setHighDmgPitch(pitch, k);
+                            else prefs.setLowDmgPitch(pitch, k);
+
+                            if (a)
+                                sender.sendMessage("§fChanged §6" + target.getName() + "§f's " + name + " " + (h ? "high" : "low") + " damage pitch to §6" + pitch);
+                            else
+                                sender.sendMessage("§fChanged " + name + " " + (h ? "high" : "low") + " damage pitch to §6" + pitch);
                             return true;
                         } catch (NumberFormatException e) {
                             sender.sendMessage("§cInvalid float value!");
                             return true;
                         }
-                    default:
+                    }
+                    default: {
                         sender.sendMessage("§cUnknown setting!");
-                        sender.sendMessage(USAGE_HSADMIN);
+                        if (!a) sender.sendMessage("§cUsage: /" + alias + " <setting> <value>");
                         return true;
+                    }
                 }
             }
             default: {

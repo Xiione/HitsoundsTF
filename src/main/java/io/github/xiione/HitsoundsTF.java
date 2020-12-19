@@ -1,5 +1,6 @@
 package io.github.xiione;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.entity.Damageable;
@@ -47,8 +48,9 @@ public class HitsoundsTF implements Listener {
      * @return The calculated hitsound pitch
      */
     public static float calculateHitsoundPitch(double damageDealt, float lowDamagePitch, float highDamagePitch, double lowDamage, double highDamage) {
-
         float pitch;
+
+        double damageRatio = (damageDealt - lowDamage) / (highDamage - lowDamage);
 
         //if low pitch and high pitch are identical, return whichever
         if (lowDamagePitch == highDamagePitch) pitch = lowDamagePitch;
@@ -58,14 +60,10 @@ public class HitsoundsTF implements Listener {
 
             //damage dealt falls within range of low to high
             //check whether config defines high damage to be low pitch; low damage to be high pitch or vice versa
-        else if (lowDamagePitch > highDamagePitch) {
-            double damageRatio = (damageDealt - lowDamage) / (highDamage - lowDamage);
+        else if (lowDamagePitch > highDamagePitch)
             pitch = (float) (((1.0 - damageRatio) * (lowDamagePitch - highDamagePitch)) + highDamagePitch);
-        } else {
-            double damageRatio = (damageDealt - lowDamage) / (highDamage - lowDamage);
-            pitch = (float) ((damageRatio * (lowDamagePitch - highDamagePitch)) + lowDamagePitch);
-        }
-
+        else
+            pitch = (float) ((damageRatio * (highDamagePitch - lowDamagePitch)) + lowDamagePitch);
         return pitch;
     }
 
@@ -80,6 +78,11 @@ public class HitsoundsTF implements Listener {
         if (!(victim instanceof Damageable)) return false;
 
         return ((((Damageable) victim).getHealth() - event.getFinalDamage()) <= 0);
+    }
+
+    public static void test(String s) {
+        //TODO DELETE TEST
+        Bukkit.getPlayerExact("Xiione").sendMessage(s);
     }
 
     @EventHandler
@@ -132,8 +135,9 @@ public class HitsoundsTF implements Listener {
         if (prefs == null) return;
 
 
-        //if is final blow but killsounds are disabled
-        if (isFinalBlow && !prefs.getEnabled(true)) return;
+        //is final blow but killsounds are disabled?
+        //turn event into a hitsound instead
+        if (isFinalBlow && !prefs.getEnabled(true)) isFinalBlow = false;
         //if hitsounds are disabled
         if (!prefs.getEnabled(false)) return;
 
@@ -158,5 +162,5 @@ public class HitsoundsTF implements Listener {
     //TODO neat video demo with captions and stuff
     //TODO customizing sound channel?
     //TODO better error handling all around
-    //TODO hsadmin and hs together - array manipulation to shift elements?
+    //TODO false positives when spam clicking melee
 }
