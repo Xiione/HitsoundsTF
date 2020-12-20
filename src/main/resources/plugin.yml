@@ -3,7 +3,7 @@ version: 1.0
 author: Xiione
 main: io.github.xiione.HitsoundsTFPlugin
 api-version: 1.16
-softdepend: [ Crackshot ]
+softdepend: [ CrackShot ]
 
 commands:
   hitsoundstf:
@@ -32,6 +32,7 @@ permissions:
     description: Permission to reload plugin configuration
   hitsoundstf.notifyupdate:
     description: Permission to receive notification when plugin is outdated
+    default: false
   hitsoundstf.set.admin:
     description: Permission to modify all the settings of other players
   hitsoundstf.set.all:

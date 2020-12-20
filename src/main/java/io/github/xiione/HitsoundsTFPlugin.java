@@ -17,15 +17,12 @@ import java.io.IOException;
 
 public class HitsoundsTFPlugin extends JavaPlugin {
 
-    private final HitsoundsTF hitsoundsTF;
-    private final HTFCommandExecutor commandExecutor;
-
-    private SQL sql;
-
-    private final PlayerPreferencesManager preferencesManager;
-
     public final String RESOURCE_ID;
     public final String PLUGIN_VERSION;
+    private final HitsoundsTF hitsoundsTF;
+    private final HTFCommandExecutor commandExecutor;
+    private final PlayerPreferencesManager preferencesManager;
+    private SQL sql;
 
     public HitsoundsTFPlugin() {
         this.RESOURCE_ID = "00000";
@@ -81,6 +78,10 @@ public class HitsoundsTFPlugin extends JavaPlugin {
         sql.createTable();
 
         this.getServer().getPluginManager().registerEvents(hitsoundsTF, this);
+        if (this.getConfig().getBoolean("enable-crackshot")) {
+            CrackShotListener crackShotListener = new CrackShotListener(this);
+            this.getServer().getPluginManager().registerEvents(crackShotListener, this);
+        }
         this.getServer().getPluginManager().registerEvents(sql, this);
     }
 

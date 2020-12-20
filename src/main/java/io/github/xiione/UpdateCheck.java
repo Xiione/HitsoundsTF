@@ -32,14 +32,6 @@ public class UpdateCheck {
         this.currentVersion = javaPlugin.getDescription().getVersion();
     }
 
-    public enum VersionResponse {
-
-        LATEST,
-        FOUND_NEW,
-
-        UNAVAILABLE
-    }
-
     public static UpdateCheck of(JavaPlugin javaPlugin) {
         return new UpdateCheck(javaPlugin);
     }
@@ -81,5 +73,13 @@ public class UpdateCheck {
                 Bukkit.getScheduler().runTask(this.javaPlugin, () -> this.versionResponse.accept(VersionResponse.UNAVAILABLE, null));
             }
         });
+    }
+
+    public enum VersionResponse {
+
+        LATEST,
+        FOUND_NEW,
+
+        UNAVAILABLE
     }
 }

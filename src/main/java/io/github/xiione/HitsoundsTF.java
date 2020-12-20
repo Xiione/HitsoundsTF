@@ -1,6 +1,5 @@
 package io.github.xiione;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.entity.Damageable;
@@ -15,9 +14,14 @@ import org.bukkit.event.player.PlayerJoinEvent;
 
 public class HitsoundsTF implements Listener {
 
+    private static final String HTF_COOLDOWN = "htfcooldown";
+
     private final double LOW_DAMAGE;
     private final double HIGH_DAMAGE;
     private final boolean IGNORE_LOW;
+    private final boolean NO_BUFFER;
+    private final boolean USE_CRACKSHOT;
+
     private final HitsoundsTFPlugin plugin;
     private final PlayerPreferencesManager preferencesManager;
 
@@ -25,9 +29,11 @@ public class HitsoundsTF implements Listener {
         this.plugin = plugin;
         this.preferencesManager = plugin.getPreferencesManager();
 
-        IGNORE_LOW = plugin.getConfig().getBoolean("ignore-low-damage");
         LOW_DAMAGE = plugin.getConfig().getDouble("low-damage");
         HIGH_DAMAGE = plugin.getConfig().getDouble("high-damage");
+        IGNORE_LOW = plugin.getConfig().getBoolean("ignore-low-damage");
+        NO_BUFFER = plugin.getConfig().getBoolean("disable-melee-buffer");
+        USE_CRACKSHOT = plugin.getConfig().getBoolean("enable-crackshot");
     }
 
     /**
@@ -67,22 +73,11 @@ public class HitsoundsTF implements Listener {
         return pitch;
     }
 
-    /**
-     * Gets whether the victim involved in a <code>EntityDamageEvent</code> will be killed by the damage dealt
-     *
-     * @param event The event to check
-     * @return Whether the victim is killed in the event
-     */
     public static boolean isFinalBlow(EntityDamageEvent event) {
         Entity victim = event.getEntity();
         if (!(victim instanceof Damageable)) return false;
 
         return ((((Damageable) victim).getHealth() - event.getFinalDamage()) <= 0);
-    }
-
-    public static void test(String s) {
-        //TODO DELETE TEST
-        Bukkit.getPlayerExact("Xiione").sendMessage(s);
     }
 
     @EventHandler
@@ -110,23 +105,17 @@ public class HitsoundsTF implements Listener {
 
     @EventHandler
     public void onEntityDamageByEntity(EntityDamageByEntityEvent e) {
-        boolean isFinalBlow = isFinalBlow(e);
         Entity damager = e.getDamager();
-        switch (damager.getType()) {
-            case PLAYER:
-                break;
-            case ARROW:
-            case SPECTRAL_ARROW:
-            case TRIDENT:
-            case ENDER_PEARL:
-            case SNOWBALL:
-            case EGG:
-                //TODO return if shot integration is enabled
-                damager = (Player) ((Projectile) damager).getShooter();
-                break;
-            default:
-                return;
-        }
+        if (damager instanceof Projectile) {
+            if (USE_CRACKSHOT || !(((Projectile) damager).getShooter() instanceof Player)) return;
+        } else if (!(damager instanceof Player)) return;
+
+
+        boolean isFinalBlow = isFinalBlow(e);
+
+        if (!(NO_BUFFER || isFinalBlow ||
+                MetaDataManager.refreshCoolDown(e.getEntity(), HTF_COOLDOWN, 450L, plugin))) return;
+
 
         Player player = (Player) damager;
         PlayerPreferences prefs = preferencesManager.get(player.getUniqueId());
@@ -134,15 +123,13 @@ public class HitsoundsTF implements Listener {
         //grace period while preferences are being fetched
         if (prefs == null) return;
 
-
-        //is final blow but killsounds are disabled?
+        //is final blow but killsounds are disabled
         //turn event into a hitsound instead
         if (isFinalBlow && !prefs.getEnabled(true)) isFinalBlow = false;
         //if hitsounds are disabled
         if (!prefs.getEnabled(false)) return;
 
         double damage = e.getFinalDamage();
-
         Sound sound;
         float volume;
         float pitch;
@@ -155,12 +142,4 @@ public class HitsoundsTF implements Listener {
         pitch = calculateHitsoundPitch(damage, prefs.getLowDmgPitch(isFinalBlow), prefs.getHighDmgPitch(isFinalBlow), LOW_DAMAGE, HIGH_DAMAGE);
         player.playSound(player.getLocation(), sound, volume, pitch);
     }
-    //TODO resourceID
-    //TODO tracker for poison/fire damage using combatlogX api
-    //TODO test protocollib again for disable-vanilla-hitsounds - look at old github commits for clues
-    //TODO crackshot integration - custom crit sounds - "throw" new event on crackshot event?
-    //TODO neat video demo with captions and stuff
-    //TODO customizing sound channel?
-    //TODO better error handling all around
-    //TODO false positives when spam clicking melee
 }

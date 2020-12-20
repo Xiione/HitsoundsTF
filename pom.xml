@@ -62,7 +62,7 @@
             <url>https://libraries.minecraft.net/</url>
         </repository>
         <repository>
-            <id>mylib</id>
+            <id>lib</id>
             <url>file://${project.basedir}/lib</url>
         </repository>
     </repositories>
@@ -80,13 +80,6 @@
             <artifactId>commodore</artifactId>
             <version>1.9</version>
             <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.SirBlobman.combatlogx</groupId>
-            <artifactId>CombatLogX-API</artifactId>
-            <version>10.0.0.0-SNAPSHOT</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.shampaggon</groupId>

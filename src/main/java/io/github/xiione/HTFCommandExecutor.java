@@ -189,7 +189,7 @@ public class HTFCommandExecutor implements CommandExecutor, TabCompleter {
                 switch (args[0]) {
                     case "toggle": {
                         if (!(sender.hasPermission("hitsoundstf." + name + ".toggle") || a)) {
-                            sender.sendMessage(ERROR_NO_PERMISSION);
+                            sender.sendMessage("§cYou don't have permission to toggle your " + name + "!");
                             return true;
                         }
                         if (args.length == 1) {
@@ -228,7 +228,7 @@ public class HTFCommandExecutor implements CommandExecutor, TabCompleter {
                         try {
                             Sound sound = Sound.valueOf(args[1]);
                             if (!(sender.hasPermission("hitsoundstf." + name + ".sound." + sound) || a)) {
-                                sender.sendMessage("§cYou don't have permission to use " + sound + "!");
+                                sender.sendMessage("§cYou don't have permission to use sound " + sound + "!");
                                 return true;
                             }
                             prefs.setSound(sound, k);
