@@ -25,7 +25,7 @@ public class HitsoundsTFPlugin extends JavaPlugin {
     private SQL sql;
 
     public HitsoundsTFPlugin() {
-        this.RESOURCE_ID = "00000";
+        this.RESOURCE_ID = "86928";
         this.PLUGIN_VERSION = this.getDescription().getVersion();
 
         this.preferencesManager = new PlayerPreferencesManager();
