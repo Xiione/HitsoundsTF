@@ -227,7 +227,8 @@ public class HTFCommandExecutor implements CommandExecutor, TabCompleter {
                         }
                         try {
                             Sound sound = Sound.valueOf(args[1]);
-                            if (!(sender.hasPermission("hitsoundstf." + name + ".sound." + sound) || a)) {
+                            if (!(sender.hasPermission("hitsoundstf." + name + ".sound." + sound) ||
+                                    sender.hasPermission("hitsoundstf." + name + ".sound.all") || a)) {
                                 sender.sendMessage("§cYou don't have permission to use sound " + sound + "!");
                                 return true;
                             }
