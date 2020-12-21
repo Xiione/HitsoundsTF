@@ -31,12 +31,13 @@
                             <artifactSet>
                                 <includes>
                                     <include>me.lucko:commodore</include>
+                                    <include>me.lucko:commodore-file</include>
                                 </includes>
                             </artifactSet>
                             <relocations>
                                 <relocation>
                                     <pattern>me.lucko.commodore</pattern>
-                                    <shadedPattern>io.github.xiione.HitsoundsTF.commodore</shadedPattern>
+                                    <shadedPattern>io.github.xiione.commodore</shadedPattern>
                                 </relocation>
                             </relocations>
                         </configuration>

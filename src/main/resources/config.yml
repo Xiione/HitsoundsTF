@@ -68,4 +68,4 @@ default-killsound-high-damage-pitch: 0.5
 # Should integration for Crackshot weapons be provided?
 # NOTE: This will disable hitsounds and killsounds for all vanilla projectile attacks.
 # NOTE: Requires restart
-enable-crackshot: true
+enable-crackshot: false

@@ -6,6 +6,7 @@ import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
 public class CrackShotListener implements Listener {
@@ -31,7 +32,7 @@ public class CrackShotListener implements Listener {
         return ((((Damageable) victim).getHealth() - event.getDamage()) <= 0);
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onWeaponDamageEntity(WeaponDamageEntityEvent e) {
         boolean isFinalBlow = isFinalBlow(e);
 
