@@ -42,7 +42,6 @@ public class HTFCommandExecutor implements CommandExecutor, TabCompleter {
             case "hitsoundstf": {
                 if (args.length == 0) {
                     sender.sendMessage("§6HitsoundsTF " + plugin.PLUGIN_VERSION + "§7 by Xiione");
-                    sender.sendMessage("§7https://www.spigotmc.org/resources/hitsoundstf." + plugin.RESOURCE_ID + "/");
                     sender.sendMessage("§6Usage: §7/hitsoundstf [help|reload]");
                     return true;
                 } else switch (args[0]) {

@@ -1,6 +1,5 @@
 package io.github.xiione;
 
-import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Entity;
@@ -11,7 +10,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
 
 public class HitsoundsTF implements Listener {
 
@@ -81,28 +79,28 @@ public class HitsoundsTF implements Listener {
         return ((((Damageable) victim).getHealth() - event.getFinalDamage()) <= 0);
     }
 
-    @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent e) {
-        Player p = e.getPlayer();
-        if (plugin.getConfig().getBoolean("notify-update") && p.hasPermission("hitsoundstf.notifyupdate")) {
-            UpdateCheck
-                    .of(plugin)
-                    .resourceId(Integer.parseInt(plugin.RESOURCE_ID))
-                    .handleResponse((versionResponse, version) -> {
-                        switch (versionResponse) {
-                            case FOUND_NEW:
-                                p.sendMessage("§6A new version of HitsoundsTF is available!§7 (" + version + ")");
-                                p.sendMessage("§6https://www.spigotmc.org/resources/hitsoundstf." + plugin.RESOURCE_ID + "/");
-                                break;
-                            case LATEST:
-                                //simply don't send a message
-                                break;
-                            case UNAVAILABLE:
-                                p.sendMessage(ChatColor.RED + "Unable to perform a version check for HitsoundsTF.");
-                        }
-                    }).check();
-        }
-    }
+//    @EventHandler
+//    public void onPlayerJoin(PlayerJoinEvent e) {
+//        Player p = e.getPlayer();
+//        if (plugin.getConfig().getBoolean("notify-update") && p.hasPermission("hitsoundstf.notifyupdate")) {
+//            UpdateCheck
+//                    .of(plugin)
+//                    .resourceId(Integer.parseInt(plugin.RESOURCE_ID))
+//                    .handleResponse((versionResponse, version) -> {
+//                        switch (versionResponse) {
+//                            case FOUND_NEW:
+//                                p.sendMessage("§6A new version of HitsoundsTF is available!§7 (" + version + ")");
+//                                p.sendMessage("§6https://www.spigotmc.org/resources/hitsoundstf." + plugin.RESOURCE_ID + "/");
+//                                break;
+//                            case LATEST:
+//                                //simply don't send a message
+//                                break;
+//                            case UNAVAILABLE:
+//                                p.sendMessage(ChatColor.RED + "Unable to perform a version check for HitsoundsTF.");
+//                        }
+//                    }).check();
+//        }
+//    }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onEntityDamageByEntity(EntityDamageByEntityEvent e) {

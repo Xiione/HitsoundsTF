@@ -21,7 +21,7 @@ commands:
 
 permissions:
   hitsoundstf.*:
-    description: Permission for full plugin administator access
+    description: Permission for full plugin administrator access
     default: op
     children:
       hitsoundstf.reload: true
