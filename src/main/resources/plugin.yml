@@ -48,6 +48,8 @@ permissions:
       hitsoundstf.killsound.volume: true
       hitsoundstf.killsound.lowdmgpitch: true
       hitsoundstf.killsound.highdmgpitch: true
+      hitsoundstf.hitsound.custom: true
+      hitsoundstf.killsound.custom: true
 
   hitsoundstf.set.limited:
     description: Permission to modify all personal killsound settings except sound effects
@@ -84,4 +86,9 @@ permissions:
     description: Permission to change killsound low damage pitch
   hitsoundstf.killsound.highdmgpitch:
     description: Permission to change killsound high damage pitch
+
+  hitsoundstf.hitsound.custom:
+    description: Permission to use custom hitsound sound effects
+  hitsoundstf.killsound.custom:
+    description: Permission to use custom killsound sound effects
 

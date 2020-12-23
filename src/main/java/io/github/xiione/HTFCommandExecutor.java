@@ -11,8 +11,6 @@ import org.bukkit.entity.Player;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class HTFCommandExecutor implements CommandExecutor, TabCompleter {
 
@@ -178,7 +176,7 @@ public class HTFCommandExecutor implements CommandExecutor, TabCompleter {
                 if (args.length == 0) {
                     sender.sendMessage("§6" + (a ? target : (Player) sender).getName() + "'s " + name + " preferences");
                     sender.sendMessage("§fEnabled: §6" + prefs.getEnabled(k));
-                    sender.sendMessage("§fSound: §6" + prefs.getSound(k).toString());
+                    sender.sendMessage("§fSound: §6" + prefs.getSound(k));
                     sender.sendMessage("§fVolume: §6" + prefs.getVolume(k));
                     sender.sendMessage("§fLow damage pitch: §6" + prefs.getLowDmgPitch(k));
                     sender.sendMessage("§fHigh damage pitch: §6" + prefs.getHighDmgPitch(k));
@@ -221,7 +219,7 @@ public class HTFCommandExecutor implements CommandExecutor, TabCompleter {
                     case "sound": {
                         if (args.length < 2) {
                             sender.sendMessage(ERROR_TOO_FEW_ARGS);
-                            if (!a) sender.sendMessage("§cUsage: /" + alias + " <setting> <value>");
+                            if (!a) sender.sendMessage("§cUsage: /" + alias + " sound <value>");
                             return true;
                         }
                         try {
@@ -231,7 +229,7 @@ public class HTFCommandExecutor implements CommandExecutor, TabCompleter {
                                 sender.sendMessage("§cYou don't have permission to use sound " + sound + "!");
                                 return true;
                             }
-                            prefs.setSound(sound, k);
+                            prefs.setSound(sound.name(), k);
                             if (a)
                                 sender.sendMessage("§fChanged §6" + target.getName() + "§f's " + name + " to §6" + sound);
                             else sender.sendMessage("§fChanged " + name + " to §6" + sound);
@@ -244,7 +242,7 @@ public class HTFCommandExecutor implements CommandExecutor, TabCompleter {
                     case "volume": {
                         if (args.length < 2) {
                             sender.sendMessage(ERROR_TOO_FEW_ARGS);
-                            if (!a) sender.sendMessage("§cUsage: /" + alias + " <setting> <value>");
+                            if (!a) sender.sendMessage("§cUsage: /" + alias + " volume <value>");
                             return true;
                         }
                         try {
@@ -274,7 +272,8 @@ public class HTFCommandExecutor implements CommandExecutor, TabCompleter {
 
                         if (args.length < 2) {
                             sender.sendMessage(ERROR_TOO_FEW_ARGS);
-                            if (!a) sender.sendMessage("§cUsage: /" + alias + " <setting> <value>");
+                            if (!a)
+                                sender.sendMessage("§cUsage: /" + alias + " " + (h ? "high" : "low") + "dmgpitch <value>");
                             return true;
                         }
                         try {
@@ -303,6 +302,25 @@ public class HTFCommandExecutor implements CommandExecutor, TabCompleter {
                             return true;
                         }
                     }
+                    case "custom": {
+                        if (!(sender.hasPermission("hitsoundstf." + name + ".custom") || a)) {
+                            sender.sendMessage("§cYou don't have permission to use custom " + name + "s!");
+                            return true;
+                        }
+                        if (args.length < 2) {
+                            sender.sendMessage(ERROR_TOO_FEW_ARGS);
+                            if (!a) sender.sendMessage("§cUsage: /" + alias + " custom <value>");
+                            return true;
+                        }
+
+                        String sound = args[1].toLowerCase();
+                        prefs.setSound(sound, k);
+
+                        if (a)
+                            sender.sendMessage("§fChanged §6" + target.getName() + "§f's " + name + " to §6" + sound);
+                        else sender.sendMessage("§fChanged " + name + " to §6" + sound);
+                        return true;
+                    }
                     default: {
                         sender.sendMessage("§cUnknown setting!");
                         if (!a) sender.sendMessage("§cUsage: /" + alias + " <setting> <value>");
@@ -319,45 +337,7 @@ public class HTFCommandExecutor implements CommandExecutor, TabCompleter {
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-        String name = command.getName();
-        switch (name) {
-            default:
-            case "hitsoundstf":
-                return Collections.emptyList();
-            case "hitsound":
-            case "killsound": {
-                if (args.length > 2)
-                    return Collections.emptyList();
-
-                if (args.length == 0)
-                    return Collections.emptyList();
-
-                if (args[0].equals("sound")) {
-                    return Stream.of(Sound.values()).map(Sound::name).collect(Collectors.toList());
-                }
-            }
-            case "hsadmin": {
-                if (args.length > 4)
-                    return Collections.emptyList();
-
-                if (args.length == 0 || args.length == 1)
-                    return null;
-
-                if (args.length == 2)
-                    return Collections.emptyList();
-
-                switch (args[2]) {
-                    case "sound":
-                        return Stream.of(Sound.values()).map(Sound::name).collect(Collectors.toList());
-                    case "toggle":
-                    case "volume":
-                    case "lowdmgpitch":
-                    case "highdmgpitch":
-                    default:
-                        return Collections.emptyList();
-                }
-            }
-        }
+        return Collections.EMPTY_LIST;
     }
 }
 

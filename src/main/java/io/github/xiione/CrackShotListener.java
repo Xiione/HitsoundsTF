@@ -45,13 +45,15 @@ public class CrackShotListener implements Listener {
         if (!prefs.getEnabled(false)) return;
 
         double damage = e.getDamage();
-        Sound sound;
+        String sound;
         float volume;
         float pitch;
 
         if (IGNORE_LOW && !isFinalBlow && damage < LOW_DAMAGE) return;
 
         sound = prefs.getSound(isFinalBlow);
+        sound = prefs.getCustom(isFinalBlow) ? sound : Sound.valueOf(sound).getKey().toString();
+
         volume = prefs.getVolume(isFinalBlow);
         pitch = HitsoundsTF.calculateHitsoundPitch(damage, prefs.getLowDmgPitch(isFinalBlow), prefs.getHighDmgPitch(isFinalBlow), LOW_DAMAGE, HIGH_DAMAGE);
         player.playSound(player.getLocation(), sound, volume, pitch);

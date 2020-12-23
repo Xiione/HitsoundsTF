@@ -4,7 +4,7 @@ hitsound {
         off;
     }
     sound {
-        SOUND_EFFECT brigadier:string single_word;
+        sound brigadier:string single_word;
     }
     volume {
         volume brigadier:float;
@@ -14,5 +14,8 @@ hitsound {
     }
     highdmgpitch {
         pitch brigadier:float;
+    }
+    custom {
+        sound brigadier:string single_word;
     }
 }

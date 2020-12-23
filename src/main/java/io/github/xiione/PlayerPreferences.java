@@ -1,6 +1,5 @@
 package io.github.xiione;
 
-import org.bukkit.Sound;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.sql.ResultSet;
@@ -12,7 +11,8 @@ public class PlayerPreferences {
 
     private boolean enableHitsounds;
 
-    private Sound hitsound;
+    private String hitsound;
+    private boolean isHitsoundCustom;
     private float hitsoundVolume;
 
     private float lowHitPitch;
@@ -20,22 +20,32 @@ public class PlayerPreferences {
 
     private boolean enableKillsounds;
 
-    private Sound killsound;
+    private String killsound;
+    private boolean isKillsoundCustom;
     private float killsoundVolume;
 
     private float lowKillPitch;
     private float highKillPitch;
 
+
     public PlayerPreferences(ResultSet resultSet) {
         try {
             enableHitsounds = resultSet.getBoolean("enable_hitsounds");
-            hitsound = Sound.valueOf(resultSet.getString("hitsound"));
+
+            String hs = resultSet.getString("hitsound");
+            hitsound = hs;
+            isHitsoundCustom = HitsoundsTF.isSoundCustom(hs);
+
             hitsoundVolume = resultSet.getFloat("hitsound_volume");
             lowHitPitch = resultSet.getFloat("low_hit_pitch");
             highHitPitch = resultSet.getFloat("high_hit_pitch");
 
             enableKillsounds = resultSet.getBoolean("enable_killsounds");
-            killsound = Sound.valueOf(resultSet.getString("killsound"));
+
+            String ks = resultSet.getString("killsound");
+            killsound = ks;
+            isKillsoundCustom = HitsoundsTF.isSoundCustom(ks);
+
             killsoundVolume = resultSet.getFloat("killsound_volume");
             lowKillPitch = resultSet.getFloat("low_kill_pitch");
             highKillPitch = resultSet.getFloat("high_kill_pitch");
@@ -47,17 +57,27 @@ public class PlayerPreferences {
 
     public PlayerPreferences(FileConfiguration config) {
         enableHitsounds = config.getBoolean("default-enable-hitsounds");
-        hitsound = Sound.valueOf(config.getString("default-hitsound"));
+
+        String hs = config.getString("default-hitsound");
+        hitsound = hs;
+        isHitsoundCustom = HitsoundsTF.isSoundCustom(hs);
+
         hitsoundVolume = (float) config.getDouble("default-hitsound-volume");
         lowHitPitch = (float) config.getDouble("default-hitsound-low-damage-pitch");
         highHitPitch = (float) config.getDouble("default-hitsound-high-damage-pitch");
 
         enableKillsounds = config.getBoolean("default-enable-killsounds");
-        killsound = Sound.valueOf(config.getString("default-killsound"));
+
+        String ks = config.getString("default-killsound");
+        killsound = ks;
+        isKillsoundCustom = HitsoundsTF.isSoundCustom(ks);
+
         killsoundVolume = (float) config.getDouble("default-killsound-volume");
         lowKillPitch = (float) config.getDouble("default-killsound-low-damage-pitch");
         highKillPitch = (float) config.getDouble("default-killsound-high-damage-pitch");
 
+        isHitsoundCustom = false;
+        isKillsoundCustom = false;
     }
 
     public boolean changesMade() {
@@ -68,8 +88,12 @@ public class PlayerPreferences {
         return kill ? enableKillsounds : enableHitsounds;
     }
 
-    public Sound getSound(boolean kill) {
+    public String getSound(boolean kill) {
         return kill ? killsound : hitsound;
+    }
+
+    public boolean getCustom(boolean kill) {
+        return kill ? isKillsoundCustom : isHitsoundCustom;
     }
 
     public float getVolume(boolean kill) {
@@ -92,11 +116,16 @@ public class PlayerPreferences {
         changesMade = true;
     }
 
-    public void setSound(Sound sound, boolean kill) {
-        if (kill)
+    public void setSound(String sound, boolean kill) {
+        boolean isCustom = HitsoundsTF.isSoundCustom(sound);
+
+        if (kill) {
             killsound = sound;
-        else
+            isKillsoundCustom = isCustom;
+        } else {
             hitsound = sound;
+            isHitsoundCustom = isCustom;
+        }
         changesMade = true;
     }
 

@@ -74,6 +74,15 @@ public class HitsoundsTF implements Listener {
         return pitch;
     }
 
+    public static boolean isSoundCustom(String sound) {
+        try {
+            Sound.valueOf(sound);
+            return false;
+        } catch (IllegalArgumentException e) {
+            return true;
+        }
+    }
+
     public static boolean isFinalBlow(EntityDamageEvent event) {
         Entity victim = event.getEntity();
         if (!(victim instanceof Damageable)) return false;
@@ -131,7 +140,7 @@ public class HitsoundsTF implements Listener {
         if (!prefs.getEnabled(false)) return;
 
         double damage = e.getFinalDamage();
-        Sound sound;
+        String sound;
         float volume;
         float pitch;
 
@@ -139,6 +148,8 @@ public class HitsoundsTF implements Listener {
         if (IGNORE_LOW && !isFinalBlow && damage < LOW_DAMAGE) return;
 
         sound = prefs.getSound(isFinalBlow);
+        sound = prefs.getCustom(isFinalBlow) ? sound : Sound.valueOf(sound).getKey().toString();
+
         volume = prefs.getVolume(isFinalBlow);
         pitch = calculateHitsoundPitch(damage, prefs.getLowDmgPitch(isFinalBlow), prefs.getHighDmgPitch(isFinalBlow), LOW_DAMAGE, HIGH_DAMAGE);
         player.playSound(player.getLocation(), sound, volume, pitch);
