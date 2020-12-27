@@ -6,7 +6,7 @@
 
     <groupId>io.github.xiione</groupId>
     <artifactId>HitsoundsTF</artifactId>
-    <version>1.0</version>
+    <version>1.1</version>
     <build>
         <plugins>
             <plugin>
@@ -85,7 +85,7 @@
         <dependency>
             <groupId>com.shampaggon</groupId>
             <artifactId>CrackShot</artifactId>
-            <version>1.0</version>
+            <version>0.98.10</version>
             <systemPath>${project.basedir}/CrackShot.jar</systemPath>
             <scope>system</scope>
         </dependency>

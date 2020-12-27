@@ -101,7 +101,7 @@ public class HitsoundsTF implements Listener {
                         switch (versionResponse) {
                             case FOUND_NEW:
                                 p.sendMessage("§6A new version of HitsoundsTF is available!§7 (" + version + ")");
-                                p.sendMessage("§6https://www.spigotmc.org/resources/hitsoundstf." + plugin.RESOURCE_ID + "/");
+                                p.sendMessage("§7https://www.spigotmc.org/resources/hitsoundstf." + plugin.RESOURCE_ID + "/");
                                 break;
                             case LATEST:
                                 //simply don't send a message
@@ -117,14 +117,18 @@ public class HitsoundsTF implements Listener {
     public void onEntityDamageByEntity(EntityDamageByEntityEvent e) {
         Entity damager = e.getDamager();
         if (damager instanceof Projectile) {
-            if (USE_CRACKSHOT || !(((Projectile) damager).getShooter() instanceof Player)) return;
-        } else if (!(damager instanceof Player)) return;
-
+            //hand event off to crackshotlistener instead
+            if (USE_CRACKSHOT) return;
+            damager = (Entity) ((Projectile) damager).getShooter();
+        }
+        if (!(damager instanceof Player) || damager.getName().equals(e.getEntity().getName())) return;
 
         boolean isFinalBlow = isFinalBlow(e);
 
-        if (!(NO_BUFFER || isFinalBlow ||
-                MetaDataManager.refreshCoolDown(e.getEntity(), HTF_COOLDOWN, 450L, plugin))) return;
+        //if buffer is enabled and victim is on cooldown
+        //always play killsounds
+        if (!NO_BUFFER && !isFinalBlow &&
+                !MetaDataManager.refreshCoolDown(e.getEntity(), HTF_COOLDOWN, 450L, plugin)) return;
 
 
         Player player = (Player) damager;
@@ -137,7 +141,7 @@ public class HitsoundsTF implements Listener {
         //turn event into a hitsound instead
         if (isFinalBlow && !prefs.getEnabled(true)) isFinalBlow = false;
         //if hitsounds are disabled
-        if (!prefs.getEnabled(false)) return;
+        if (!prefs.getEnabled(isFinalBlow)) return;
 
         double damage = e.getFinalDamage();
         String sound;
