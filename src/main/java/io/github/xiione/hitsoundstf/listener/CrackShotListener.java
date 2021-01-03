@@ -1,6 +1,9 @@
-package io.github.xiione;
+package io.github.xiione.hitsoundstf.listener;
 
 import com.shampaggon.crackshot.events.WeaponDamageEntityEvent;
+import io.github.xiione.hitsoundstf.HitsoundsTFPlugin;
+import io.github.xiione.hitsoundstf.PlayerPreferences;
+import io.github.xiione.hitsoundstf.PlayerPreferencesManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Entity;

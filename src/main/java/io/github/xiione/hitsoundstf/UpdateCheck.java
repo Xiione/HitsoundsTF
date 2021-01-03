@@ -1,4 +1,4 @@
-package io.github.xiione;
+package io.github.xiione.hitsoundstf;
 
 import com.google.common.base.Preconditions;
 import com.google.common.io.Resources;

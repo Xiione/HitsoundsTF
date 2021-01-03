@@ -1,6 +1,6 @@
-package io.github.xiione;
+package io.github.xiione.hitsoundstf.listener;
 
-import org.bukkit.ChatColor;
+import io.github.xiione.hitsoundstf.*;
 import org.bukkit.Sound;
 import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Entity;
@@ -104,10 +104,9 @@ public class HitsoundsTF implements Listener {
                                 p.sendMessage("§7https://www.spigotmc.org/resources/hitsoundstf." + plugin.RESOURCE_ID + "/");
                                 break;
                             case LATEST:
-                                //simply don't send a message
                                 break;
                             case UNAVAILABLE:
-                                p.sendMessage(ChatColor.RED + "Unable to perform a version check for HitsoundsTF.");
+                                p.sendMessage("§cUnable to perform a version check for HitsoundsTF.");
                         }
                     }).check();
         }
@@ -158,4 +157,8 @@ public class HitsoundsTF implements Listener {
         pitch = calculateHitsoundPitch(damage, prefs.getLowDmgPitch(isFinalBlow), prefs.getHighDmgPitch(isFinalBlow), LOW_DAMAGE, HIGH_DAMAGE);
         player.playSound(player.getLocation(), sound, volume, pitch);
     }
+
+
+    //TODO tracker for poison/fire damage using combatlogX api
+    //TODO potionsplashevent
 }

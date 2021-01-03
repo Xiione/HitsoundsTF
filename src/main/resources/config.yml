@@ -41,11 +41,14 @@ high-damage: 20.0
 
 # Should attacks that deal less than low-damage be ignored?
 # This means that attacks that deal damage that is too low will not produce a hitsound.
+# This will not affect hitsounds caused by fire or poison damage.
+# NOTE: Requires restart
 ignore-low-damage: false
 
 # Should melee attacks that deal "overriding" damage during the victim's invincibility period
 # still play a hitsound? This means that damage that doesn't cause the target to begin briefly
 # flash red will be acknowledged by the plugin.
+# NOTE: Requires restart
 disable-melee-buffer: false
 
 ## Player preference defaults ##

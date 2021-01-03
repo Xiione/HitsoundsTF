@@ -1,4 +1,4 @@
-package io.github.xiione;
+package io.github.xiione.hitsoundstf;
 
 import org.bukkit.entity.Entity;
 import org.bukkit.metadata.FixedMetadataValue;

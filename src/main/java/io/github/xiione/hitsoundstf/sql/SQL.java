@@ -1,8 +1,8 @@
-package io.github.xiione.sql;
+package io.github.xiione.hitsoundstf.sql;
 
-import io.github.xiione.HitsoundsTFPlugin;
-import io.github.xiione.PlayerPreferences;
-import io.github.xiione.PlayerPreferencesManager;
+import io.github.xiione.hitsoundstf.HitsoundsTFPlugin;
+import io.github.xiione.hitsoundstf.PlayerPreferences;
+import io.github.xiione.hitsoundstf.PlayerPreferencesManager;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;

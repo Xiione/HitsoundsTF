@@ -1,9 +1,12 @@
-package io.github.xiione;
+package io.github.xiione.hitsoundstf;
 
 import com.mojang.brigadier.tree.LiteralCommandNode;
-import io.github.xiione.sql.MySQL;
-import io.github.xiione.sql.SQL;
-import io.github.xiione.sql.SQLite;
+import io.github.xiione.hitsoundstf.listener.CrackShotListener;
+import io.github.xiione.hitsoundstf.listener.HitsoundsTF;
+import io.github.xiione.hitsoundstf.listener.TagListener;
+import io.github.xiione.hitsoundstf.sql.MySQL;
+import io.github.xiione.hitsoundstf.sql.SQL;
+import io.github.xiione.hitsoundstf.sql.SQLite;
 import me.lucko.commodore.Commodore;
 import me.lucko.commodore.CommodoreProvider;
 import me.lucko.commodore.file.CommodoreFileFormat;
@@ -78,10 +81,18 @@ public class HitsoundsTFPlugin extends JavaPlugin {
         sql.createTable();
 
         this.getServer().getPluginManager().registerEvents(hitsoundsTF, this);
-        if (this.getConfig().getBoolean("enable-crackshot")) {
+
+        if (this.getConfig().getBoolean("enable-crackshot") &&
+                this.getServer().getPluginManager().getPlugin("CrackShot") != null) {
             CrackShotListener crackShotListener = new CrackShotListener(this);
             this.getServer().getPluginManager().registerEvents(crackShotListener, this);
         }
+
+        if (this.getServer().getPluginManager().getPlugin("CombatLogX") != null) {
+            TagListener tagListener = new TagListener(this);
+            this.getServer().getPluginManager().registerEvents(tagListener, this);
+        }
+
         this.getServer().getPluginManager().registerEvents(sql, this);
     }
 

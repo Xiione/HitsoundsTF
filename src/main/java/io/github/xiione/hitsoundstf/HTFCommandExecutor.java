@@ -1,4 +1,4 @@
-package io.github.xiione;
+package io.github.xiione.hitsoundstf;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;

@@ -1,5 +1,6 @@
-package io.github.xiione;
+package io.github.xiione.hitsoundstf;
 
+import io.github.xiione.hitsoundstf.listener.HitsoundsTF;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.sql.ResultSet;
