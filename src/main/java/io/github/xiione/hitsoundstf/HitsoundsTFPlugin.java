@@ -3,7 +3,6 @@ package io.github.xiione.hitsoundstf;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.github.xiione.hitsoundstf.listener.CrackShotListener;
 import io.github.xiione.hitsoundstf.listener.HitsoundsTF;
-import io.github.xiione.hitsoundstf.listener.TagListener;
 import io.github.xiione.hitsoundstf.sql.MySQL;
 import io.github.xiione.hitsoundstf.sql.SQL;
 import io.github.xiione.hitsoundstf.sql.SQLite;
@@ -86,11 +85,6 @@ public class HitsoundsTFPlugin extends JavaPlugin {
                 this.getServer().getPluginManager().getPlugin("CrackShot") != null) {
             CrackShotListener crackShotListener = new CrackShotListener(this);
             this.getServer().getPluginManager().registerEvents(crackShotListener, this);
-        }
-
-        if (this.getServer().getPluginManager().getPlugin("CombatLogX") != null) {
-            TagListener tagListener = new TagListener(this);
-            this.getServer().getPluginManager().registerEvents(tagListener, this);
         }
 
         this.getServer().getPluginManager().registerEvents(sql, this);

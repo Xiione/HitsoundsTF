@@ -337,6 +337,7 @@ public class HTFCommandExecutor implements CommandExecutor, TabCompleter {
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+        if (command.getName().equals("hsadmin") && args[0].equals("")) return null;
         return Collections.EMPTY_LIST;
     }
 }

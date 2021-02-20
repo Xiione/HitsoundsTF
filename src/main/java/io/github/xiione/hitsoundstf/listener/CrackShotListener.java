@@ -18,6 +18,7 @@ public class CrackShotListener implements Listener {
     private final double LOW_DAMAGE;
     private final double HIGH_DAMAGE;
     private final boolean IGNORE_LOW;
+    private final boolean IGNORE_ZERO;
 
     private final HitsoundsTFPlugin plugin;
     private final PlayerPreferencesManager preferencesManager;
@@ -29,10 +30,13 @@ public class CrackShotListener implements Listener {
         LOW_DAMAGE = plugin.getConfig().getDouble("low-damage");
         HIGH_DAMAGE = plugin.getConfig().getDouble("high-damage");
         IGNORE_LOW = plugin.getConfig().getBoolean("ignore-low-damage");
+        IGNORE_ZERO = plugin.getConfig().getBoolean("ignore-zero-damage");
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onWeaponDamageEntity(WeaponDamageEntityEvent e) {
+        if (e.isCancelled()) return;
+
         Player player = e.getPlayer();
         Entity victim = e.getVictim();
         if (player.getName().equals(victim.getName())) return;
@@ -57,6 +61,7 @@ public class CrackShotListener implements Listener {
             float volume;
             float pitch;
 
+            if (IGNORE_ZERO && !isFinalBlow && damage <= 0) return;
             if (IGNORE_LOW && !isFinalBlow && damage < LOW_DAMAGE) return;
 
             sound = prefs.getSound(isFinalBlow);

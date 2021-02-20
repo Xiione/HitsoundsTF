@@ -12,6 +12,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.projectiles.ProjectileSource;
 
 public class HitsoundsTF implements Listener {
 
@@ -20,6 +21,7 @@ public class HitsoundsTF implements Listener {
     private final double LOW_DAMAGE;
     private final double HIGH_DAMAGE;
     private final boolean IGNORE_LOW;
+    private final boolean IGNORE_ZERO;
     private final boolean NO_BUFFER;
     private final boolean USE_CRACKSHOT;
 
@@ -33,6 +35,7 @@ public class HitsoundsTF implements Listener {
         LOW_DAMAGE = plugin.getConfig().getDouble("low-damage");
         HIGH_DAMAGE = plugin.getConfig().getDouble("high-damage");
         IGNORE_LOW = plugin.getConfig().getBoolean("ignore-low-damage");
+        IGNORE_ZERO = plugin.getConfig().getBoolean("ignore-zero-damage");
         NO_BUFFER = plugin.getConfig().getBoolean("disable-melee-buffer");
         USE_CRACKSHOT = plugin.getConfig().getBoolean("enable-crackshot");
     }
@@ -114,11 +117,23 @@ public class HitsoundsTF implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onEntityDamageByEntity(EntityDamageByEntityEvent e) {
+        if (e.isCancelled()) return;
+
+        if (e.isApplicable(EntityDamageEvent.DamageModifier.BLOCKING)) {
+            if (e.getDamage(EntityDamageEvent.DamageModifier.BLOCKING) < 0) {
+                return;
+            }
+        }
+
         Entity damager = e.getDamager();
+
         if (damager instanceof Projectile) {
             //hand event off to crackshotlistener instead
             if (USE_CRACKSHOT) return;
-            damager = (Entity) ((Projectile) damager).getShooter();
+
+            ProjectileSource source = ((Projectile) damager).getShooter();
+            if (!(source instanceof Entity)) return;
+            damager = (Entity) source;
         }
         if (!(damager instanceof Player) || damager.getName().equals(e.getEntity().getName())) return;
 
@@ -148,6 +163,7 @@ public class HitsoundsTF implements Listener {
         float pitch;
 
         //ignore if config says to, killsounds will always play
+        if (IGNORE_ZERO && !isFinalBlow && damage <= 0) return;
         if (IGNORE_LOW && !isFinalBlow && damage < LOW_DAMAGE) return;
 
         sound = prefs.getSound(isFinalBlow);
@@ -157,8 +173,4 @@ public class HitsoundsTF implements Listener {
         pitch = calculateHitsoundPitch(damage, prefs.getLowDmgPitch(isFinalBlow), prefs.getHighDmgPitch(isFinalBlow), LOW_DAMAGE, HIGH_DAMAGE);
         player.playSound(player.getLocation(), sound, volume, pitch);
     }
-
-
-    //TODO tracker for poison/fire damage using combatlogX api
-    //TODO potionsplashevent
 }

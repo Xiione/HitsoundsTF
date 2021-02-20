@@ -3,7 +3,7 @@ version: 1.1.1
 author: Xiione
 main: io.github.xiione.hitsoundstf.HitsoundsTFPlugin
 api-version: 1.16
-softdepend: [ CrackShot, CombatLogX ]
+softdepend: [ CrackShot ]
 
 commands:
   hitsoundstf:
